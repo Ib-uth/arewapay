@@ -1,0 +1,11 @@
+node_modules
+**/node_modules
+.git
+**/.venv
+**/__pycache__
+.pytest_cache
+.ruff_cache
+*.pyc
+dist
+apps/frontend/dist
+packages/shared-types/dist

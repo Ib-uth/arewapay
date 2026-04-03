@@ -1,0 +1,53 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: arewapay
+      POSTGRES_PASSWORD: arewapay
+      POSTGRES_DB: arewapay
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U arewapay -d arewapay"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  api:
+    build:
+      context: ./apps/backend
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql+psycopg2://arewapay:arewapay@db:5432/arewapay
+      REDIS_URL: redis://redis:6379/0
+      JWT_SECRET: ${JWT_SECRET:-change-me-use-long-random-string-in-production}
+      CORS_ORIGINS: http://localhost:5173,http://127.0.0.1:5173,http://localhost:8080,http://localhost
+      PUBLIC_APP_URL: http://localhost:8080
+      API_PUBLIC_URL: http://localhost:8000
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+  frontend:
+    build:
+      context: .
+      dockerfile: apps/frontend/Dockerfile
+      args:
+        VITE_REVENUECAT_API_KEY: ${VITE_REVENUECAT_API_KEY:-}
+    ports:
+      - "8080:80"
+    depends_on:
+      - api
+
+volumes:
+  postgres_data:

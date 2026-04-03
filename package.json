@@ -1,0 +1,12 @@
+{
+  "name": "arewapay",
+  "private": true,
+  "workspaces": [
+    "apps/frontend",
+    "packages/shared-types"
+  ],
+  "scripts": {
+    "lint": "npm run lint --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present"
+  }
+}
