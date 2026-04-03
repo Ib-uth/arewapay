@@ -20,13 +20,13 @@ from app.schemas.invoice import (
     InvoiceUpdate,
     PaymentCreate,
 )
+from app.services.bill_to import format_bill_to_snapshot
 from app.services.invoice_calc import (
     apply_items_and_tax,
     apply_overdue,
     recalculate_totals_from_db_items,
     recompute_status_from_payments,
 )
-from app.services.bill_to import format_bill_to_snapshot
 from app.services.plan_enforcement import assert_can_create_invoice
 
 router = APIRouter(prefix="/invoices", tags=["invoices"])

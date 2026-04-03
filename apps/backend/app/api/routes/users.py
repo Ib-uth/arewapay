@@ -4,9 +4,9 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
+from app.core.security import verify_password
 from app.db import get_db
 from app.deps.auth import CurrentUser
-from app.models.user import User
 from app.schemas.auth import (
     DeleteAccountRequest,
     MeResponse,
@@ -14,7 +14,6 @@ from app.schemas.auth import (
     UserProfileUpdate,
     UserPublic,
 )
-from app.core.security import verify_password
 
 router = APIRouter(prefix="/users", tags=["users"])
 

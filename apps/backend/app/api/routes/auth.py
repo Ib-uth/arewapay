@@ -2,26 +2,25 @@ import uuid
 from datetime import UTC, datetime, timedelta
 from typing import Annotated
 
-from fastapi import APIRouter, Cookie, Depends, HTTPException, Query, Request, Response, status
-from sqlalchemy import func, select
+from fastapi import APIRouter, Cookie, Depends, HTTPException, Query, Request, Response
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.config import settings
+from app.core.limiter import limiter
 from app.core.security import (
     create_access_token,
     create_email_verify_token,
     create_refresh_token_jti,
-    decode_token,
     hash_password,
     hash_token,
     safe_decode,
     verify_password,
 )
 from app.db import get_db
-from app.deps.auth import CurrentUser, get_current_user
+from app.deps.auth import CurrentUser
 from app.models.user import RefreshToken, User, UserRole
 from app.schemas.auth import LoginRequest, MeResponse, RegisterRequest, TokenResponse, UserPublic
-from app.core.limiter import limiter
 from app.services.email import send_verification_email
 
 router = APIRouter(prefix="/auth", tags=["auth"])
