@@ -6,19 +6,18 @@ primary_region = "lhr"
 [build]
   dockerfile = "Dockerfile"
 
-[env]
-  UVICORN_HOST = "::"
-
 [http_service]
   internal_port = 8000
   force_https = true
+  # Keep ≥1 machine: SPA nginx proxies /api → .internal; stopped API = 502 for users.
   auto_stop_machines = "stop"
   auto_start_machines = true
-  min_machines_running = 0
+  min_machines_running = 1
 
 [[http_service.checks]]
   interval = "15s"
-  timeout = "3s"
-  grace_period = "10s"
+  timeout = "5s"
+  # Alembic + Uvicorn can exceed 10s on cold boot; short grace flaps checks.
+  grace_period = "30s"
   method = "GET"
   path = "/health"

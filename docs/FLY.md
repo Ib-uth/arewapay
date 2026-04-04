@@ -7,6 +7,10 @@ Two Fly apps (same organization):
 | **API** | [`apps/backend/fly.toml`](../apps/backend/fly.toml) | FastAPI + Alembic migrations on boot |
 | **Web** | [`fly.web.toml`](../fly.web.toml) (repo root) | Static SPA + nginx proxy `/api` → API over 6PN |
 
+The API app sets **`min_machines_running = 1`** so a machine is always up. If the API scales to **zero**, the web app’s nginx still calls `arewapay-api.internal:8000` and users see **502 Bad Gateway** until (and unless) a cold start finishes in time.
+
+The API container runs Uvicorn via [`app/serve.py`](../apps/backend/app/serve.py): bind `::` with `IPV6_V6ONLY=0` so **Fly’s IPv4 edge** and **IPv6 private mesh** (nginx → `.internal`) both reach the same port. Binding only `0.0.0.0` breaks `/api` proxying; binding only `[::]` without `V6ONLY=0` can break edge health checks.
+
 Deploy API from `apps/backend`. Deploy web from **repository root** so the frontend Dockerfile can see the monorepo `package-lock.json`.
 
 ## Prerequisites
