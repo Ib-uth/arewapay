@@ -8,13 +8,17 @@ RUN npm ci
 COPY apps/frontend ./apps/frontend
 COPY packages/shared-types ./packages/shared-types
 WORKDIR /repo/apps/frontend
-# Baked into the static bundle at build time (pass from docker-compose `build.args` or `docker build --build-arg`).
+# Baked into the static bundle at build time (pass from docker-compose `build.args` or `fly deploy --build-arg`).
 ARG VITE_REVENUECAT_API_KEY=
 ENV VITE_REVENUECAT_API_KEY=$VITE_REVENUECAT_API_KEY
 RUN npm run build
 
 FROM nginx:1.27-alpine
 COPY --from=build /repo/apps/frontend/dist /usr/share/nginx/html
-COPY apps/frontend/nginx.conf /etc/nginx/conf.d/default.conf
+COPY apps/frontend/nginx/default.conf.template /etc/nginx/templates/default.conf.template
+COPY apps/frontend/docker-nginx-entry.sh /docker-nginx-entry.sh
+RUN chmod +x /docker-nginx-entry.sh
+# Docker Compose: service hostname `api`. Fly.io: e.g. `arewapay-api.internal:8000` (same Fly org).
+ENV API_UPSTREAM=api:8000
 EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+ENTRYPOINT ["/docker-nginx-entry.sh"]

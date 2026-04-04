@@ -15,7 +15,7 @@
 
 **Live demo:** _Add your deployed URL (e.g. Railway + static host)._
 
-**Deploy for free (tiers & caveats):** see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
+**Deploy for free (tiers & caveats):** see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md). **Fly.io:** [docs/FLY.md](docs/FLY.md).
 
 ---
 

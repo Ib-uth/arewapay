@@ -68,6 +68,12 @@ Use an **always-free** or **cheap** VM and run the same stack as locally.
 
 ---
 
+## Fly.io (configured in this repo)
+
+Step-by-step: **[docs/FLY.md](FLY.md)** — two apps (`arewapay-api` + `arewapay-web`), Postgres on Fly, Redis via Upstash, private `.internal` proxy for `/api`.
+
+---
+
 ## Option 2 — Managed Postgres + Redis (free tiers) + app on a PaaS
 
 Use free database layers and run only the API + build the SPA elsewhere.

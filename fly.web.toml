@@ -1,0 +1,20 @@
+# Fly.io — SPA + nginx proxy to API over private network.
+# Deploy from monorepo ROOT: fly deploy --config fly.web.toml
+#
+# Replace arewapay-api with your API app name from apps/backend/fly.toml.
+# Web and API apps must be in the same Fly.io organization.
+app = "arewapay-web"
+primary_region = "lhr"
+
+[build]
+  dockerfile = "apps/frontend/Dockerfile"
+
+[env]
+  API_UPSTREAM = "arewapay-api.internal:8000"
+
+[http_service]
+  internal_port = 80
+  force_https = true
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 0

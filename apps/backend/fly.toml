@@ -1,0 +1,21 @@
+# Fly.io — API (FastAPI). Deploy from monorepo: cd apps/backend && fly deploy
+# First time: fly apps create arewapay-api && fly postgres attach ...
+app = "arewapay-api"
+primary_region = "lhr"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[http_service]
+  internal_port = 8000
+  force_https = true
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 0
+
+[[http_service.checks]]
+  interval = "15s"
+  timeout = "3s"
+  grace_period = "10s"
+  method = "GET"
+  path = "/health"
