@@ -61,7 +61,7 @@ export function AccountSettings() {
                 onClick={() => themeMut.mutate(t)}
                 className={`rounded-full border px-4 py-2 text-sm capitalize ${
                   activeTheme === t
-                    ? "border-charcoal bg-charcoal text-white dark:border-accent dark:bg-accent dark:text-charcoal"
+                    ? "border-charcoal bg-charcoal text-white dark:border-accent dark:bg-accent dark:text-white"
                     : "border-charcoal/20 text-charcoal hover:bg-off dark:border-white/20 dark:text-white dark:hover:bg-white/10"
                 }`}
               >

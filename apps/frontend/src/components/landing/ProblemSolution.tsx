@@ -9,13 +9,13 @@ const problems = [
 const solutions = [
   "One ledger for every client & invoice",
   "Outstanding & overdue at a glance",
-  "Professional PDFs + payment records",
+  "Professional PDFs + settlement history",
 ];
 
 export function ProblemSolution() {
   return (
     <div id="features" className="flex w-full flex-col md:flex-row">
-      <div className="flex min-h-[420px] flex-1 flex-col justify-start bg-charcoal px-6 py-16 md:px-12 md:py-20">
+      <div className="flex min-h-[420px] flex-1 flex-col justify-start bg-footer px-6 py-16 md:px-12 md:py-20">
         <p className="font-display text-4xl uppercase leading-[0.9] text-white md:text-5xl">
           The old way
         </p>

@@ -31,7 +31,10 @@ def assert_can_add_client(db: Session, user: User) -> None:
     if n >= lim:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail=f"Client limit reached ({lim}) for your plan. Upgrade to add more.",
+            detail=(
+                f"Client limit reached ({lim}). Remove a client or contact support "
+                "if you need more capacity."
+            ),
         )
 
 
@@ -44,5 +47,8 @@ def assert_can_create_invoice(db: Session, user: User) -> None:
     if n >= lim:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail=f"Invoice limit ({lim} per 30 days) reached for your plan. Upgrade to continue.",
+            detail=(
+                f"Invoice limit reached ({lim} per rolling 30 days). "
+                "Try again next month or contact support."
+            ),
         )

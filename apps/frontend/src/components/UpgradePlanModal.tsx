@@ -101,7 +101,7 @@ export function UpgradePlanModal({ open, onClose }: { open: boolean; onClose: ()
                   type="button"
                   disabled={busyId !== null}
                   onClick={() => void buy(pkg)}
-                  className="font-sans rounded-lg bg-charcoal px-4 py-2 text-sm font-medium text-white hover:bg-charcoal/90 disabled:opacity-50 dark:bg-accent dark:text-charcoal dark:hover:brightness-95"
+                  className="font-sans rounded-lg bg-charcoal px-4 py-2 text-sm font-medium text-white hover:bg-charcoal/90 disabled:opacity-50 dark:bg-accent dark:text-white dark:hover:brightness-110"
                 >
                   {busyId === pkg.identifier ? "Processing…" : "Select"}
                 </button>

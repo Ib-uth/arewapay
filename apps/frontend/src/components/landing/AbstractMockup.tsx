@@ -5,7 +5,7 @@ export function AbstractMockup() {
     <div className="border-light overflow-hidden rounded-xl bg-white shadow-2xl">
       <div className="flex items-center gap-2 border-b border-charcoal/10 bg-off px-4 py-3">
         <span className="h-3 w-3 rounded-full bg-red-400/80" />
-        <span className="h-3 w-3 rounded-full bg-yellow-400/80" />
+        <span className="h-3 w-3 rounded-full bg-accent/90" />
         <span className="h-3 w-3 rounded-full bg-green-400/80" />
         <span className="font-sans flex-1 text-center text-xs font-medium text-charcoal/50">
           ArewaPay — Invoices
@@ -24,7 +24,7 @@ export function AbstractMockup() {
             <p className="font-display text-center text-lg uppercase text-charcoal">INV-2026-001</p>
             <div className="mt-3 h-2 w-full rounded bg-charcoal/10" />
             <div className="mt-2 h-2 w-4/5 rounded bg-charcoal/5" />
-            <div className="absolute -right-2 -bottom-2 flex items-center gap-1 rounded-full border border-charcoal/10 bg-accent px-2 py-1 text-[10px] font-medium text-charcoal shadow">
+            <div className="absolute -right-2 -bottom-2 flex items-center gap-1 rounded-full border border-white/20 bg-accent px-2 py-1 text-[10px] font-medium text-white shadow">
               <IconSpark className="h-3 w-3" /> Paid
             </div>
           </div>

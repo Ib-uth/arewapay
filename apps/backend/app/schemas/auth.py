@@ -42,8 +42,40 @@ class LoginRequest(BaseModel):
     password: str
 
 
+class RegisterVerifyRequest(BaseModel):
+    email: EmailStr
+    otp: str = Field(..., min_length=6, max_length=6)
+
+    @field_validator("otp", mode="before")
+    @classmethod
+    def digits_only(cls, v: object) -> object:
+        if isinstance(v, str):
+            v = v.strip()
+            if not v.isdigit():
+                raise ValueError("Code must be 6 digits")
+        return v
+
+
 class TokenResponse(BaseModel):
     message: str = "ok"
+
+
+class RegisterOtpResponse(BaseModel):
+    message: str
+    email_sent: bool = False
+
+
+class ResendOtpRequest(BaseModel):
+    email: EmailStr
+
+
+class OtpStatusOut(BaseModel):
+    wait_seconds: int
+    can_resend: bool
+    exhausted: bool
+    sends_used: int
+    max_sends: int = 5
+    email_configured: bool = False
 
 
 class PlanLimitsOut(BaseModel):
@@ -61,6 +93,10 @@ class UserPublic(BaseModel):
     email: str
     role: UserRole
     email_verified: bool
+    phone_verified: bool = False
+    first_name: str | None = None
+    last_name: str | None = None
+    phone: str | None = None
     display_name: str | None = None
     country_code: str | None = None
     currency_code: str | None = None
@@ -129,8 +165,10 @@ class UserProfileUpdate(BaseModel):
 
 class OnboardingCompleteRequest(BaseModel):
     display_name: str | None = Field(None, max_length=255)
+    company_name: str | None = Field(None, max_length=255)
     country_code: str = Field(..., min_length=2, max_length=2)
     currency_code: str = Field(..., min_length=3, max_length=3)
+    survey: dict[str, str] | None = None
 
     @field_validator("country_code", "currency_code", mode="before")
     @classmethod
@@ -138,6 +176,34 @@ class OnboardingCompleteRequest(BaseModel):
         if isinstance(v, str):
             return v.strip().upper()
         return v
+
+    @field_validator("company_name", "display_name", mode="before")
+    @classmethod
+    def strip_opt(cls, v: object) -> object:
+        if isinstance(v, str):
+            s = v.strip()
+            return s or None
+        return v
+
+    @field_validator("survey", mode="before")
+    @classmethod
+    def survey_bounds(cls, v: object) -> object:
+        if v is None:
+            return None
+        if not isinstance(v, dict):
+            raise ValueError("Survey must be an object")
+        if len(v) > 5:
+            raise ValueError("At most 5 survey answers")
+        out: dict[str, str] = {}
+        for k, val in v.items():
+            if not isinstance(k, str) or not k.strip():
+                raise ValueError("Invalid survey key")
+            if not isinstance(val, str):
+                raise ValueError("Survey values must be strings")
+            if len(val) > 500:
+                raise ValueError("Survey answer too long")
+            out[k.strip()[:64]] = val.strip()[:500]
+        return out or None
 
 
 class DeleteAccountRequest(BaseModel):

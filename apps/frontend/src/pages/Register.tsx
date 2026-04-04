@@ -87,7 +87,7 @@ export function Register() {
 
   async function onSubmit(values: Form) {
     try {
-      await apiFetch("/auth/register", {
+      const res = await apiFetch<{ message: string; email_sent: boolean }>("/auth/register/request", {
         method: "POST",
         body: JSON.stringify({
           email: values.email,
@@ -98,7 +98,9 @@ export function Register() {
           phone: values.phone.trim(),
         }),
       });
-      navigate("/app");
+      navigate("/register/verify", {
+        state: { email: values.email, email_sent: res.email_sent },
+      });
     } catch (e) {
       setError("root", { message: e instanceof Error ? e.message : "Registration failed" });
     }
@@ -123,7 +125,7 @@ export function Register() {
         <div>
           <p className="font-display text-5xl uppercase leading-[0.9]">Create your workspace</p>
           <p className="font-sans mt-6 max-w-sm text-sage/90">
-            Clients, invoices, and payment tracking — built for African SMEs.
+            Clients, invoices, and receivables — multi-currency · built for African SMEs.
           </p>
         </div>
         <div aria-hidden className="h-px w-16 bg-white/10" />
@@ -231,7 +233,7 @@ export function Register() {
               variant="dark"
               className="w-full rounded-lg py-4 text-base"
             >
-              {isSubmitting ? "Creating…" : "Create account"}
+              {isSubmitting ? "Sending code…" : "Continue with email code"}
             </Button>
           </form>
           <p className="font-sans mt-8 text-center text-sm text-charcoal/60 dark:text-white/60">

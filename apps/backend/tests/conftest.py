@@ -16,7 +16,15 @@ from app.config import settings  # noqa: E402
 from app.core.limiter import limiter  # noqa: E402
 from app.db import Base, get_db  # noqa: E402
 from app.main import app  # noqa: E402
-from app.models import Client, Invoice, InvoiceItem, Payment, RefreshToken, User  # noqa: E402, F401
+from app.models import (  # noqa: E402, F401
+    Client,
+    Invoice,
+    InvoiceItem,
+    Payment,
+    RefreshToken,
+    RegistrationPending,
+    User,
+)
 
 
 @pytest.fixture(scope="session")
@@ -73,12 +81,13 @@ def _clean_tables(db_session):
         db_session.execute(text("DELETE FROM invoices"))
         db_session.execute(text("DELETE FROM clients"))
         db_session.execute(text("DELETE FROM refresh_tokens"))
+        db_session.execute(text("DELETE FROM registration_pending"))
         db_session.execute(text("DELETE FROM users"))
     else:
         db_session.execute(
             text(
-                "TRUNCATE TABLE payments, invoice_items, invoices, clients, refresh_tokens, users "
-                "RESTART IDENTITY CASCADE"
+                "TRUNCATE TABLE payments, invoice_items, invoices, clients, refresh_tokens, "
+                "registration_pending, users RESTART IDENTITY CASCADE"
             )
         )
     db_session.commit()

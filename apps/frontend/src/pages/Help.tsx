@@ -15,7 +15,7 @@ export function Help() {
             <ul className="font-sans mt-4 list-inside list-disc space-y-2 text-charcoal/80 dark:text-white/80">
               <li>Add clients under Clients — you&apos;ll need them before creating invoices.</li>
               <li>Create invoices from Invoices → New invoice; download PDF when ready.</li>
-              <li>Record payments on an invoice to keep balances accurate.</li>
+              <li>Log amounts received on an invoice to keep balances accurate.</li>
             </ul>
           </div>
           <div className="card-interactive rounded-2xl border border-charcoal/10 bg-white p-6 dark:border-white/10 dark:bg-dark">

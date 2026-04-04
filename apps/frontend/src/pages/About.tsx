@@ -22,7 +22,7 @@ export function About() {
           <div>
             <h2 className="font-display text-3xl uppercase text-charcoal">Mission</h2>
             <p className="font-sans mt-4 text-charcoal/75">
-              Give every growing business a single place for clients, invoices, and payments — so
+              Give every growing business a single place for clients, invoices, and receivables — so
               cash flow is visible and chasing stops being the default mode of work.
             </p>
           </div>
@@ -30,7 +30,7 @@ export function About() {
             <h2 className="font-display text-3xl uppercase text-charcoal">Principles</h2>
             <ul className="font-sans mt-4 list-inside list-disc space-y-2 text-charcoal/75">
               <li>Defaults that respect your country and currency</li>
-              <li>Honest UX — no dark patterns on billing</li>
+              <li>Honest UX — clear limits without dark patterns</li>
               <li>Security-minded auth and session handling</li>
             </ul>
           </div>

@@ -12,7 +12,7 @@ export function Features() {
             Everything receivables in one workspace
           </h1>
           <p className="font-sans mt-8 max-w-2xl text-lg text-charcoal/70">
-            ArewaPay helps African SMEs issue invoices, track payments, and see who owes what —
+            ArewaPay helps African SMEs issue invoices, track balances, and see who owes what —
             without spreadsheets or scattered WhatsApp threads.
           </p>
           <div className="mt-10 flex flex-wrap gap-4">
@@ -20,7 +20,7 @@ export function Features() {
               Get started
             </Button>
             <Button variant="ghost" to="/pricing">
-              View pricing
+              FAQ &amp; contact
             </Button>
           </div>
         </Container>
@@ -34,8 +34,8 @@ export function Features() {
                 body: "Line items, taxes, due dates, PDF export — in your default currency.",
               },
               {
-                title: "Payments & status",
-                body: "Record partial or full payments; overdue and outstanding stay visible.",
+                title: "Balances & status",
+                body: "Log partial or full settlements; overdue and outstanding stay visible.",
               },
               {
                 title: "Dashboard & insight",

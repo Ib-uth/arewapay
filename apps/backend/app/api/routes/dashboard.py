@@ -61,8 +61,8 @@ def dashboard_summary(
         recent.append(
             RecentTransaction(
                 id=p.id,
-                type="payment",
-                description=f"Payment — invoice {inv_num}",
+                type="settlement",
+                description=f"Settlement — invoice {inv_num}",
                 amount=str(p.amount),
                 occurred_at=p.paid_at,
             )

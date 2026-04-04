@@ -1,4 +1,14 @@
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+def _sqlalchemy_psycopg2_url(url: str) -> str:
+    """Fly.io sets DATABASE_URL with postgres://; SQLAlchemy expects postgresql+psycopg2://."""
+    if url.startswith("postgres://"):
+        return "postgresql+psycopg2://" + url.removeprefix("postgres://")
+    if url.startswith("postgresql://"):
+        return "postgresql+psycopg2://" + url.removeprefix("postgresql://")
+    return url
 
 
 class Settings(BaseSettings):
@@ -27,6 +37,13 @@ class Settings(BaseSettings):
     revenuecat_webhook_secret: str | None = None
     revenuecat_premium_product_ids: str = ""
     revenuecat_unlimited_product_ids: str = ""
+
+    @field_validator("database_url", mode="before")
+    @classmethod
+    def database_url_for_sqlalchemy(cls, v: object) -> object:
+        if isinstance(v, str):
+            return _sqlalchemy_psycopg2_url(v)
+        return v
 
     def cors_origin_list(self) -> list[str]:
         return [o.strip() for o in self.cors_origins.split(",") if o.strip()]

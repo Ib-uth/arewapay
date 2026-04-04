@@ -11,8 +11,8 @@ const steps = [
     body: "Line items, tax, due date, and a PDF your clients can trust.",
   },
   {
-    title: "Track payments",
-    body: "Record partials, mark paid, and see overdue before it hurts.",
+    title: "Track settlements",
+    body: "Record partials, mark invoices settled, and spot overdue before it hurts.",
   },
 ];
 

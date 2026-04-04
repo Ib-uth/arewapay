@@ -11,7 +11,7 @@
   <img src="https://img.shields.io/badge/GitHub_Actions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white" alt="GitHub Actions" />
 </p>
 
-**Invoicing and payment tracking for African SMEs** — one workspace for clients, NGN-first invoices, partial payments, overdue visibility, and subscription plans.
+**Invoicing and receivables for African SMEs** — multi-currency clients and invoices, balance visibility, overdue tracking, and workspace limits (no storefront checkout in the app UI).
 
 **Live demo:** _Add your deployed URL (e.g. Railway + static host)._
 
@@ -33,14 +33,14 @@
 
 ## What’s in the product
 
-- **Auth & session:** Registration and login, JWT access + refresh in httpOnly cookies, `/auth/me`, logout.
-- **Onboarding:** First-run flow before the main app.
+- **Auth & session:** Email OTP registration (`/auth/register/request` → `/auth/register/verify`), login only after verified email, JWT access + refresh in httpOnly cookies, `/auth/me`, logout.
+- **Onboarding:** First-run flow (country, currency, optional company name, short survey) before the main app.
 - **Dashboard:** Revenue summary, monthly chart, top clients, plan usage.
 - **Clients:** Table view, CSV export, structured address fields; **Add client** on a dedicated page.
-- **Invoices:** Table + export, create flow with line items, tax, due date; **bill-to** snapshot from the client address; PDF download; payments and status (draft → paid / overdue).
+- **Invoices:** Table + export, create flow with line items, tax, due date; **bill-to** snapshot from the client address; PDF download; settlement rows and status (draft → paid / overdue).
 - **Settings:** Full-width **Profile** and **Account** (display name, country, currency, theme). Theme (light / dark / system) applies **inside the signed-in app** only; marketing and auth pages stay light.
-- **Plans & limits:** Tier-based caps on clients and rolling invoice volume; upgrade entry points and a billing modal (configure `VITE_REVENUECAT_API_KEY` for live offerings).
-- **Marketing:** Landing, features, pricing, about; nav shows an **avatar menu** when you’re logged in (dashboard, profile, logout).
+- **Plans & limits:** Tier-based caps on clients and rolling invoice volume; in-app copy points to Help instead of checkout.
+- **Marketing:** Landing, features, FAQ/contact page (`/pricing` route), about, legal pages; nav shows an **avatar menu** when you’re logged in (dashboard, profile, logout).
 
 ---
 
@@ -68,7 +68,7 @@ Monorepo layout: **`apps/frontend`**, **`apps/backend`**, **`packages/shared-typ
 ## Technical notes
 
 - **FastAPI:** Typed routes, automatic OpenAPI at `/docs`.
-- **PostgreSQL:** Relational model for invoices, payments, and uniqueness constraints.
+- **PostgreSQL:** Relational model for invoices, settlement line items (`payments` table), and uniqueness constraints.
 - **JWT in httpOnly cookies** with refresh rotation on `/auth/refresh`.
 - **React Query** for server state and cache invalidation after mutations.
 - **CI:** Ruff + pytest (backend); ESLint + Vitest + production build (frontend); non-blocking audits; **Docker Compose build** to verify images; **Dependabot** for npm and pip.
@@ -80,13 +80,15 @@ Monorepo layout: **`apps/frontend`**, **`apps/backend`**, **`packages/shared-typ
 ### Docker (full stack)
 
 ```bash
-cp .env.example .env   # edit secrets; for frontend build in Docker add VITE_REVENUECAT_API_KEY to .env if needed
+cp .env.example .env   # edit secrets; set RESEND_API_KEY + EMAIL_FROM for real OTP email in Docker
 docker compose up --build
 ```
 
 The frontend image builds from the **repository root** so `npm ci` uses the root **`package-lock.json`**. Vite reads env from the **monorepo root** (`apps/frontend/vite.config.ts` → `envDir`).
 
-- **Frontend:** http://localhost:8080 (nginx → `/api` proxied to API)
+If **`address already in use` on port 8080**, set **`FRONTEND_PORT=8081`** (or another free port) in `.env`; Compose updates the published port and the API’s **`CORS_ORIGINS`** / **`PUBLIC_APP_URL`** to match.
+
+- **Frontend:** http://localhost:8080 by default — set **`FRONTEND_PORT`** in `.env` if that port is busy; nginx → `/api` proxied to API
 - **API:** http://localhost:8000 — Swagger at http://localhost:8000/docs
 - **PostgreSQL:** `localhost:5432` (default user/db: `arewapay`)
 
@@ -133,6 +135,12 @@ See [.env.example](.env.example). **Do not commit secrets.** `VITE_*` keys are e
 ## CI
 
 On **push** and **pull requests** to `main`, GitHub Actions runs backend Ruff + pytest, frontend lint/test/build, optional security audits, and **`docker compose build`**. **Dependabot** opens weekly update PRs for npm and pip.
+
+---
+
+## Phone verification (SMS)
+
+There is no unlimited free production SMS. Options include **Firebase Phone Auth** (limited free tier), **Twilio trial** (development only), or paid regional providers. Plan budget and compliance before offering SMS verification.
 
 ---
 

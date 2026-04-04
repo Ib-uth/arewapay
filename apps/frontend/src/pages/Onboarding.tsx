@@ -12,21 +12,34 @@ export function Onboarding() {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const [displayName, setDisplayName] = useState(user.display_name ?? "");
+  const [companyName, setCompanyName] = useState("");
   const [country, setCountry] = useState(user.country_code ?? "NG");
   const [currency, setCurrency] = useState(
     user.currency_code ?? AFRICAN_COUNTRIES.find((c) => c.code === "NG")?.currency ?? "NGN",
   );
+  const [businessType, setBusinessType] = useState("");
+  const [teamSize, setTeamSize] = useState("");
+  const [primaryGoal, setPrimaryGoal] = useState("");
+  const [referral, setReferral] = useState("");
 
   const mut = useMutation({
-    mutationFn: () =>
-      apiFetch<{ user: UserPublic }>("/users/me/onboarding", {
+    mutationFn: () => {
+      const survey: Record<string, string> = {};
+      if (businessType) survey.business_type = businessType;
+      if (teamSize) survey.team_size = teamSize;
+      if (primaryGoal) survey.primary_goal = primaryGoal;
+      if (referral.trim()) survey.referral = referral.trim();
+      return apiFetch<{ user: UserPublic }>("/users/me/onboarding", {
         method: "POST",
         body: JSON.stringify({
           display_name: displayName.trim() || null,
+          company_name: companyName.trim() || null,
           country_code: country,
           currency_code: currency,
+          survey: Object.keys(survey).length ? survey : undefined,
         }),
-      }),
+      });
+    },
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ["me"] });
       navigate("/app", { replace: true });
@@ -43,14 +56,17 @@ export function Onboarding() {
     if (row) setCurrency(row.currency);
   }
 
+  const selectClass =
+    "font-sans mt-2 w-full rounded-lg border border-charcoal/20 bg-white px-4 py-3 text-charcoal focus:border-charcoal/40 focus:outline-none focus:ring-2 focus:ring-accent/40 dark:border-white/20 dark:bg-charcoal dark:text-white";
+
   return (
     <div className="mx-auto max-w-lg px-4 py-12">
       <h1 className="font-display text-4xl uppercase leading-[0.9] text-charcoal dark:text-white md:text-5xl">
         Welcome to ArewaPay
       </h1>
       <p className="font-sans mt-4 text-charcoal/70 dark:text-white/70">
-        Tell us a bit about your business so we can use the right currency and personalize your
-        workspace. You can change this anytime in settings.
+        Tell us about your workspace so we use the right currency and can improve the product. You can change
+        this anytime in settings.
       </p>
       <form
         className="mt-10 space-y-6"
@@ -61,24 +77,29 @@ export function Onboarding() {
       >
         <div>
           <label className="font-sans block text-sm font-medium text-charcoal dark:text-white">
-            Business or display name (optional)
+            How should we greet you? (optional)
           </label>
           <input
             className="font-sans mt-2 w-full rounded-lg border border-charcoal/20 bg-white px-4 py-3 text-charcoal focus:border-charcoal/40 focus:outline-none focus:ring-2 focus:ring-accent/40 dark:border-white/20 dark:bg-charcoal dark:text-white"
             value={displayName}
             onChange={(e) => setDisplayName(e.target.value)}
-            placeholder="e.g. Acme Trading Ltd"
+            placeholder="Your name or preferred label"
           />
         </div>
         <div>
           <label className="font-sans block text-sm font-medium text-charcoal dark:text-white">
-            Country
+            Company name (optional)
           </label>
-          <select
+          <input
             className="font-sans mt-2 w-full rounded-lg border border-charcoal/20 bg-white px-4 py-3 text-charcoal focus:border-charcoal/40 focus:outline-none focus:ring-2 focus:ring-accent/40 dark:border-white/20 dark:bg-charcoal dark:text-white"
-            value={country}
-            onChange={(e) => onCountryChange(e.target.value)}
-          >
+            value={companyName}
+            onChange={(e) => setCompanyName(e.target.value)}
+            placeholder="e.g. Acme Trading Ltd"
+          />
+        </div>
+        <div>
+          <label className="font-sans block text-sm font-medium text-charcoal dark:text-white">Country</label>
+          <select className={selectClass} value={country} onChange={(e) => onCountryChange(e.target.value)}>
             {AFRICAN_COUNTRIES.map((c) => (
               <option key={c.code} value={c.code}>
                 {c.name}
@@ -91,7 +112,7 @@ export function Onboarding() {
             Default currency
           </label>
           <select
-            className="font-sans mt-2 w-full rounded-lg border border-charcoal/20 bg-white px-4 py-3 text-charcoal focus:border-charcoal/40 focus:outline-none focus:ring-2 focus:ring-accent/40 dark:border-white/20 dark:bg-charcoal dark:text-white"
+            className={selectClass}
             value={currency}
             onChange={(e) => setCurrency(e.target.value)}
           >
@@ -101,6 +122,61 @@ export function Onboarding() {
               </option>
             ))}
           </select>
+        </div>
+        <div>
+          <label className="font-sans block text-sm font-medium text-charcoal dark:text-white">
+            What best describes you? (optional)
+          </label>
+          <select
+            className={selectClass}
+            value={businessType}
+            onChange={(e) => setBusinessType(e.target.value)}
+          >
+            <option value="">Prefer not to say</option>
+            <option value="freelancer">Freelancer / solo</option>
+            <option value="sme">Small business</option>
+            <option value="growing">Growing team</option>
+            <option value="nonprofit">Nonprofit / NGO</option>
+          </select>
+        </div>
+        <div>
+          <label className="font-sans block text-sm font-medium text-charcoal dark:text-white">
+            Team size (optional)
+          </label>
+          <select className={selectClass} value={teamSize} onChange={(e) => setTeamSize(e.target.value)}>
+            <option value="">Prefer not to say</option>
+            <option value="1">Just me</option>
+            <option value="2-10">2–10</option>
+            <option value="11-50">11–50</option>
+            <option value="50+">50+</option>
+          </select>
+        </div>
+        <div>
+          <label className="font-sans block text-sm font-medium text-charcoal dark:text-white">
+            Primary goal (optional)
+          </label>
+          <select
+            className={selectClass}
+            value={primaryGoal}
+            onChange={(e) => setPrimaryGoal(e.target.value)}
+          >
+            <option value="">Prefer not to say</option>
+            <option value="visibility">See who owes what</option>
+            <option value="speed">Get invoices out faster</option>
+            <option value="reporting">Reporting for stakeholders</option>
+            <option value="multi">Multi-currency clarity</option>
+          </select>
+        </div>
+        <div>
+          <label className="font-sans block text-sm font-medium text-charcoal dark:text-white">
+            How did you hear about us? (optional)
+          </label>
+          <input
+            className="font-sans mt-2 w-full rounded-lg border border-charcoal/20 bg-white px-4 py-3 text-charcoal focus:border-charcoal/40 focus:outline-none focus:ring-2 focus:ring-accent/40 dark:border-white/20 dark:bg-charcoal dark:text-white"
+            value={referral}
+            onChange={(e) => setReferral(e.target.value)}
+            placeholder="Friend, social, search…"
+          />
         </div>
         {mut.isError && (
           <p className="text-sm text-red-600">{String((mut.error as Error).message)}</p>

@@ -1,10 +1,10 @@
 from datetime import date, timedelta
 
-from tests.helpers import register_payload
+from tests.helpers import register_and_login
 
 
 def test_invoice_create_and_payment(client):
-    client.post("/auth/register", json=register_payload())
+    register_and_login(client)
     cr = client.post(
         "/clients",
         json={

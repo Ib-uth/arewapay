@@ -21,10 +21,10 @@ export function LandingHero() {
         <h1 className="font-display mt-8 text-5xl uppercase leading-[0.9] tracking-normal text-charcoal sm:text-7xl md:text-8xl lg:text-9xl">
           Invoices that
           <br />
-          <span className="highlight-bar">actually get paid</span>
+          <span className="highlight-bar">close the loop</span>
         </h1>
         <p className="font-sans mx-auto mt-8 max-w-xl text-lg font-normal text-charcoal/70">
-          Stop chasing payments on WhatsApp. ArewaPay brings clients, multi-currency invoices, and
+          Stop chasing balances in chat threads. ArewaPay brings clients, multi-currency invoices, and
           cash flow into one brutalist-clear workspace.
         </p>
         <form

@@ -12,10 +12,13 @@ import { InvoiceDetail } from "./pages/InvoiceDetail";
 import { InvoiceNew } from "./pages/InvoiceNew";
 import { Invoices } from "./pages/Invoices";
 import { Landing } from "./pages/Landing";
+import { LegalPrivacy } from "./pages/LegalPrivacy";
+import { LegalTerms } from "./pages/LegalTerms";
 import { Login } from "./pages/Login";
 import { Onboarding } from "./pages/Onboarding";
 import { Pricing } from "./pages/Pricing";
 import { Register } from "./pages/Register";
+import { RegisterVerify } from "./pages/RegisterVerify";
 import { SettingsLayout } from "./layouts/SettingsLayout";
 import { AccountSettings } from "./pages/settings/AccountSettings";
 import { ProfileSettings } from "./pages/settings/ProfileSettings";
@@ -42,9 +45,12 @@ export default function App() {
             <Route path="/features" element={<Features />} />
             <Route path="/pricing" element={<Pricing />} />
             <Route path="/about" element={<About />} />
+            <Route path="/legal/terms" element={<LegalTerms />} />
+            <Route path="/legal/privacy" element={<LegalPrivacy />} />
           </Route>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/register/verify" element={<RegisterVerify />} />
           <Route path="/app" element={<AppShell />}>
             <Route path="onboarding" element={<Onboarding />} />
             <Route index element={<Dashboard />} />

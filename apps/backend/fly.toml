@@ -6,6 +6,9 @@ primary_region = "lhr"
 [build]
   dockerfile = "Dockerfile"
 
+[env]
+  UVICORN_HOST = "::"
+
 [http_service]
   internal_port = 8000
   force_https = true

@@ -1,10 +1,15 @@
 server {
-    listen 80;
+    # Fly health checks expect IPv4; private API DNS resolves at request time (not parse time).
+    listen 0.0.0.0:80;
     server_name localhost;
+    resolver @@@NGINX_RESOLVER@@@;
     root /usr/share/nginx/html;
     index index.html;
+    set $api_upstream http://@@@API_UPSTREAM@@@;
     location /api/ {
-        proxy_pass http://@@@API_UPSTREAM@@@/;
+        # Variable proxy_pass does not apply the /api/→/ URI rewrite; strip prefix explicitly.
+        rewrite ^/api/(.*)$ /$1 break;
+        proxy_pass $api_upstream;
         proxy_http_version 1.1;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;

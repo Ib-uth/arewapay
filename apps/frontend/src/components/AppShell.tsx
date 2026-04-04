@@ -6,8 +6,6 @@ import { useResolvedAppTheme } from "../hooks/useResolvedAppTheme";
 import { apiFetch } from "../api/client";
 import { AppSidebar } from "./AppSidebar";
 import { AppTopBar } from "./AppTopBar";
-import { RevenueCatBootstrap } from "./RevenueCatBootstrap";
-
 export function AppShell() {
   const { data, isLoading, isError } = useMe();
   const navigate = useNavigate();
@@ -81,7 +79,6 @@ export function AppShell() {
   return (
     <AppThemeProvider isDark={isDark}>
       <div className={shellClass}>
-        <RevenueCatBootstrap user={u} />
         <AppSidebar
           user={u}
           onLogout={() => void logout()}

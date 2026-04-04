@@ -7,7 +7,7 @@ export function MarketingFooter() {
   const user = data?.user;
 
   return (
-    <footer className="border-t border-charcoal/10 bg-charcoal text-white">
+    <footer className="border-t border-white/10 bg-footer text-white">
       <Container className="py-14">
         <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-4">
           <div>
@@ -15,8 +15,8 @@ export function MarketingFooter() {
               ArewaPay<span className="text-accent">.</span>
             </p>
             <p className="font-sans mt-4 max-w-xs text-sm leading-relaxed text-sage/90">
-              Invoicing and payment tracking built for African SMEs — one workspace for clients,
-              receivables, and cash visibility.
+              Invoicing and receivables for African SMEs — one workspace for clients, balances, and cash-flow
+              visibility.
             </p>
           </div>
           <div>
@@ -29,7 +29,7 @@ export function MarketingFooter() {
               </li>
               <li>
                 <Link className="hover:text-accent" to="/pricing">
-                  Pricing
+                  FAQ
                 </Link>
               </li>
               {user ? (
@@ -70,10 +70,14 @@ export function MarketingFooter() {
                 </Link>
               </li>
               <li>
-                <span className="text-sage/70">Legal (coming soon)</span>
+                <Link className="hover:text-accent" to="/legal/terms">
+                  Terms
+                </Link>
               </li>
               <li>
-                <span className="text-sage/70">Privacy (coming soon)</span>
+                <Link className="hover:text-accent" to="/legal/privacy">
+                  Privacy
+                </Link>
               </li>
             </ul>
           </div>

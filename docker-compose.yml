@@ -29,9 +29,11 @@ services:
       DATABASE_URL: postgresql+psycopg2://arewapay:arewapay@db:5432/arewapay
       REDIS_URL: redis://redis:6379/0
       JWT_SECRET: ${JWT_SECRET:-change-me-use-long-random-string-in-production}
-      CORS_ORIGINS: http://localhost:5173,http://127.0.0.1:5173,http://localhost:8080,http://localhost
-      PUBLIC_APP_URL: http://localhost:8080
+      CORS_ORIGINS: http://localhost:5173,http://127.0.0.1:5173,http://localhost:${FRONTEND_PORT:-8080},http://127.0.0.1:${FRONTEND_PORT:-8080},http://localhost
+      PUBLIC_APP_URL: http://localhost:${FRONTEND_PORT:-8080}
       API_PUBLIC_URL: http://localhost:8000
+      RESEND_API_KEY: ${RESEND_API_KEY:-}
+      EMAIL_FROM: ${EMAIL_FROM:-ArewaPay <onboarding@resend.dev>}
     depends_on:
       db:
         condition: service_healthy
@@ -45,7 +47,7 @@ services:
       args:
         VITE_REVENUECAT_API_KEY: ${VITE_REVENUECAT_API_KEY:-}
     ports:
-      - "8080:80"
+      - "${FRONTEND_PORT:-8080}:80"
     depends_on:
       - api
 

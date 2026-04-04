@@ -14,11 +14,11 @@ const jsonLd = {
   applicationCategory: "BusinessApplication",
   operatingSystem: "Web",
   description:
-    "Invoice and payment management for African SMEs — clients, multi-currency invoices, payment tracking, and reporting.",
+    "Invoice and receivables workspace for African SMEs — clients, multi-currency invoices, balance tracking, and reporting.",
   offers: {
     "@type": "Offer",
     price: "0",
-    priceCurrency: "NGN",
+    priceCurrency: "USD",
   },
 };
 

@@ -1,8 +1,8 @@
-from tests.helpers import register_payload
+from tests.helpers import register_and_login
 
 
 def _register(client):
-    client.post("/auth/register", json=register_payload())
+    register_and_login(client)
 
 
 def test_clients_crud(client):

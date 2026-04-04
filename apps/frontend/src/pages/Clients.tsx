@@ -54,7 +54,7 @@ export function Clients() {
             Clients
           </h1>
           <p className="font-sans mt-2 text-charcoal/60 dark:text-white/60">
-            People and companies you invoice in NGN.
+            People and companies you invoice — defaults use your workspace currency.
           </p>
         </div>
         <div className="flex flex-wrap gap-3">
@@ -75,10 +75,11 @@ export function Clients() {
 
       {atClientCap && (
         <div className="rounded-xl border border-accent/40 bg-accent/10 px-4 py-3 font-sans text-sm text-charcoal dark:text-white">
-          You&apos;re at your plan&apos;s client limit ({user.usage.clients}/{clientCap}).{" "}
-          <Link to="/pricing" className="font-medium underline">
-            Upgrade
-          </Link>
+          You&apos;ve reached the client limit for your workspace ({user.usage.clients}/{clientCap}).{" "}
+          <Link to="/app/help" className="font-medium underline">
+            Help center
+          </Link>{" "}
+          has tips on organizing clients, or remove a client you no longer need.
         </div>
       )}
 

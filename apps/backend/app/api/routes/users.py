@@ -53,8 +53,10 @@ def complete_onboarding(
     db: Annotated[Session, Depends(get_db)],
 ) -> MeResponse:
     user.display_name = body.display_name
+    user.company_name = body.company_name
     user.country_code = body.country_code
     user.currency_code = body.currency_code
+    user.onboarding_survey = body.survey
     user.onboarding_completed_at = datetime.now(UTC)
     db.commit()
     db.refresh(user)

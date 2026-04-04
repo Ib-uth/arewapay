@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { apiFetch } from "../api/client";
@@ -16,6 +16,8 @@ type Form = z.infer<typeof schema>;
 
 export function Login() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const justVerified = Boolean((location.state as { registered?: boolean } | null)?.registered);
 
   useEffect(() => {
     clearRootDarkClass();
@@ -49,10 +51,10 @@ export function Login() {
         <div>
           <p className="font-display text-5xl uppercase leading-[0.9]">Welcome back</p>
           <p className="font-sans mt-6 max-w-sm text-sage/90">
-            Your invoices and payments — one login away.
+            Your invoices and balances — one login away.
           </p>
         </div>
-        <p className="font-sans text-sm text-sage/60">NGN-first · Built for African SMEs</p>
+        <p className="font-sans text-sm text-sage/60">Multi-currency · Built for businesses across Africa</p>
       </div>
       <div className="flex flex-1 flex-col justify-center px-6 py-12 lg:px-16">
         <Link
@@ -66,6 +68,11 @@ export function Login() {
             Log in
           </h1>
           <p className="font-sans mt-4 text-charcoal/70">Use the email and password for your workspace.</p>
+          {justVerified && (
+            <p className="font-sans mt-4 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900">
+              Email verified — you can sign in now.
+            </p>
+          )}
           <form className="mt-10 space-y-6" onSubmit={handleSubmit(onSubmit)}>
             <div>
               <label className="font-sans block text-sm font-medium text-charcoal">Email</label>

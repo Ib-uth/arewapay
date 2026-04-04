@@ -3,7 +3,7 @@
 #
 # Replace arewapay-api with your API app name from apps/backend/fly.toml.
 # Web and API apps must be in the same Fly.io organization.
-app = "arewapay-web"
+app = "arewapay"
 primary_region = "lhr"
 
 [build]

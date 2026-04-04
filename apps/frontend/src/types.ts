@@ -91,7 +91,7 @@ export interface DashboardSummary {
   overdue_count: number;
   recent_transactions: {
     id: string;
-    type: string;
+    type: "settlement" | string;
     description: string;
     amount: string;
     occurred_at: string;

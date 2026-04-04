@@ -1,64 +1,55 @@
-# Deploy on Fly.io
+# Fly.io deployment (ArewaPay)
 
-This repo includes **`apps/backend/fly.toml`** (API) and **`fly.web.toml`** at the root (nginx + static SPA). The frontend proxies `/api` to the API using **Fly private networking** (`<api-app>.internal:8000`).
+Two Fly apps (same organization):
 
----
+| App | Config | Purpose |
+|-----|--------|---------|
+| **API** | [`apps/backend/fly.toml`](../apps/backend/fly.toml) | FastAPI + Alembic migrations on boot |
+| **Web** | [`fly.web.toml`](../fly.web.toml) (repo root) | Static SPA + nginx proxy `/api` → API over 6PN |
+
+Deploy API from `apps/backend`. Deploy web from **repository root** so the frontend Dockerfile can see the monorepo `package-lock.json`.
 
 ## Prerequisites
 
-1. [Install `flyctl`](https://fly.io/docs/hands-on/install-flyctl/) and run `fly auth login`.
-2. Replace app names if you don’t want `arewapay-api` / `arewapay-web`: edit `apps/backend/fly.toml` (`app = "..."`) and **`fly.web.toml`**:
-   - `app = "..."`
-   - `[env] API_UPSTREAM = "<your-api-app-name>.internal:8000"`
+- [Fly CLI](https://fly.io/docs/hands-on/install-flyctl/) installed and `fly auth login`
+- GitHub: push this repo to your remote (e.g. `origin` on `main`)
 
-Web and API **must use the same Fly organization** so `.internal` DNS works.
-
----
-
-## 1. Postgres
-
-```bash
-fly postgres create --name arewapay-db --region lhr
-```
-
-Create the API app (first deploy or explicit create):
+## 1. Postgres (API)
 
 ```bash
 cd apps/backend
-fly apps create arewapay-api
-fly postgres attach --app arewapay-api arewapay-db
+fly postgres create   # or attach an existing cluster
+fly postgres attach <postgres-cluster-name> -a arewapay-api
 ```
 
-`fly postgres attach` sets `DATABASE_URL` on the API app.
+This sets `DATABASE_URL` on the API app.
 
----
+## 2. API secrets (required + new mail vars)
 
-## 2. Redis
-
-Fly doesn’t bundle Redis in this setup. Use **[Upstash](https://upstash.com/)** (or similar), create a Redis database, copy the **TLS** URL (`rediss://...`), then:
-
-```bash
-fly secrets set -a arewapay-api REDIS_URL="rediss://..."
-```
-
----
-
-## 3. Deploy the API
+Set **all** of these on the API app (`arewapay-api`). Replace URLs with your real **HTTPS** web app URL (e.g. `https://arewapay.fly.dev`).
 
 ```bash
 cd apps/backend
 
 fly secrets set -a arewapay-api \
   JWT_SECRET="$(openssl rand -hex 32)" \
-  CORS_ORIGINS="https://arewapay-web.fly.dev" \
+  CORS_ORIGINS="https://arewapay.fly.dev,https://www.yourdomain.com" \
+  PUBLIC_APP_URL="https://arewapay.fly.dev" \
+  API_PUBLIC_URL="https://arewapay-api.fly.dev" \
   COOKIE_SECURE="true" \
-  PUBLIC_APP_URL="https://arewapay-web.fly.dev" \
-  API_PUBLIC_URL="https://arewapay-api.fly.dev"
+  RESEND_API_KEY="re_..." \
+  EMAIL_FROM='noreply@arewapay.africa <noreply@quodel.com>'
 ```
 
-After you have a **custom domain** on the web app, update `CORS_ORIGINS` and `PUBLIC_APP_URL` to that URL.
+Notes:
 
-Optional (billing):
+- **`CORS_ORIGINS`**: comma-separated, no spaces (or match how your app parses). Must include every browser origin that calls the API (usually your **web** app URL only, because `/api` is same-origin when proxied through nginx — if you ever call the API hostname directly from the browser, add that too).
+- **`PUBLIC_APP_URL`**: used in emails/links; must match where users open the SPA.
+- **`API_PUBLIC_URL`**: external URL of the API (for absolute links if needed).
+- **`COOKIE_SECURE`**: `true` in production (HTTPS only).
+- **`RESEND_API_KEY` / `EMAIL_FROM`**: required for signup OTP. `EMAIL_FROM` must use a domain verified in [Resend](https://resend.com). Display-name masking is supported (see [`.env.example`](../.env.example)).
+
+Optional (RevenueCat webhooks):
 
 ```bash
 fly secrets set -a arewapay-api \
@@ -67,91 +58,61 @@ fly secrets set -a arewapay-api \
   REVENUECAT_UNLIMITED_PRODUCT_IDS="lifetime"
 ```
 
-Deploy:
+Redis: add a Fly Redis (Upstash) URL if you later wire the app to it:
 
 ```bash
-fly deploy -a arewapay-api
+fly secrets set -a arewapay-api REDIS_URL="redis://..."
 ```
 
-Smoke tests:
-
-- `https://arewapay-api.fly.dev/health`
-- `https://arewapay-api.fly.dev/docs`
-
-The API image runs **`alembic upgrade head`** on each container start (`docker-entrypoint.sh`), then **uvicorn**.
-
----
-
-## 4. Create the web app and deploy
-
-From the **repository root**:
+## 3. Deploy API
 
 ```bash
-fly apps create arewapay-web
+cd apps/backend
+fly deploy
 ```
 
-Build-time RevenueCat key (optional):
+Entrypoint runs `alembic upgrade head` before Uvicorn (migrations including OTP / onboarding columns apply automatically).
+
+## 4. Web app build args (optional)
+
+The SPA build can receive `VITE_REVENUECAT_API_KEY` at **image build** time (optional).
 
 ```bash
-fly deploy --config fly.web.toml --build-arg VITE_REVENUECAT_API_KEY="your_public_sdk_key"
+cd /path/to/arewapay   # monorepo root
+fly deploy --config fly.web.toml --build-arg VITE_REVENUECAT_API_KEY=""
 ```
 
-Or omit the arg if you don’t use billing in the browser.
+If you omit it, the build uses an empty key (RevenueCat UI is already removed from the product surface).
+
+Ensure [`fly.web.toml`](../fly.web.toml) has `API_UPSTREAM = "arewapay-api.internal:8000"` matching your **API app name**.
+
+## 5. Deploy web
 
 ```bash
+cd /path/to/arewapay   # monorepo root
 fly deploy --config fly.web.toml
 ```
 
-Open **`https://arewapay-web.fly.dev`**. The SPA calls **`/api`** on the same host; nginx forwards to **`arewapay-api.internal:8000`**.
+## 6. GitHub
 
----
+Push `main` (or your default branch) to GitHub; CI runs [`.github/workflows/ci.yml`](../.github/workflows/ci.yml).
 
-## 5. RevenueCat webhook
+To deploy from GitHub Actions, add repo secrets `FLY_API_TOKEN` (and optionally split deploy jobs) — not configured by default in this repo.
 
-If you use server webhooks, point RevenueCat at:
+## Environment variable reference (API)
 
-`https://arewapay-web.fly.dev/api/webhooks/revenuecat`
+| Variable | Required | Purpose |
+|----------|----------|---------|
+| `DATABASE_URL` | Yes | Set by `fly postgres attach` |
+| `JWT_SECRET` | Yes | Auth token signing |
+| `CORS_ORIGINS` | Yes | Allowed browser origins |
+| `PUBLIC_APP_URL` | Yes | Public SPA base URL |
+| `API_PUBLIC_URL` | Yes | Public API base URL |
+| `COOKIE_SECURE` | Prod: `true` | httpOnly cookies |
+| `RESEND_API_KEY` | For OTP | Transactional email |
+| `EMAIL_FROM` | For OTP | Verified Resend sender |
+| `REDIS_URL` | Optional | Rate limits / future jobs |
+| `REVENUECAT_*` | Optional | Webhook tier mapping |
+| `COOKIE_DOMAIN` | Optional | Only if you use a shared parent domain |
 
-(nginx strips the `/api` prefix when proxying to the API, same as local Docker.)
-
----
-
-## 6. Custom domain (optional)
-
-```bash
-fly certs add -a arewapay-web app.example.com
-```
-
-Add the DNS records `fly certs show` prints. Then:
-
-```bash
-fly secrets set -a arewapay-api \
-  CORS_ORIGINS="https://app.example.com" \
-  PUBLIC_APP_URL="https://app.example.com"
-```
-
-Redeploy API (and web if needed).
-
----
-
-## Troubleshooting
-
-| Issue | What to check |
-|--------|----------------|
-| 502 / empty API from browser | `API_UPSTREAM` in `fly.web.toml` must match the **API app name** exactly: `<name>.internal:8000`. Same org. |
-| CORS errors | `CORS_ORIGINS` must be the **web** URL (scheme + host, no trailing slash), comma-separated if several. |
-| Cookies not sticking | `COOKIE_SECURE=true` and HTTPS on the web app. |
-| DB errors | `DATABASE_URL` after attach; use SSL if your provider requires it. |
-
----
-
-## Files touched in-repo
-
-| File | Role |
-|------|------|
-| `apps/backend/fly.toml` | API Machine, port 8000, `/health` check |
-| `fly.web.toml` | Web Machine, root Dockerfile context, `API_UPSTREAM` |
-| `apps/frontend/nginx/default.conf.template` | nginx config with `@@@API_UPSTREAM@@@` placeholder |
-| `apps/frontend/docker-nginx-entry.sh` | Substitutes placeholder, starts nginx |
-
-Local **Docker Compose** is unchanged in behavior: default `API_UPSTREAM=api:8000`.
+See also [`.env.example`](../.env.example).

@@ -6,11 +6,11 @@ from sqlalchemy.orm import Session
 
 from app.models.client import Client
 from app.models.invoice import Invoice, InvoiceStatus
-from tests.helpers import register_payload
+from tests.helpers import register_and_login
 
 
 def _register(client):
-    client.post("/auth/register", json=register_payload())
+    register_and_login(client)
     r = client.get("/auth/me")
     assert r.status_code == 200
     return r.json()["user"]["id"]

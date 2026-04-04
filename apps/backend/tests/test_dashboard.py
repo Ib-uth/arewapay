@@ -1,10 +1,10 @@
 from datetime import date, timedelta
 
-from tests.helpers import register_payload
+from tests.helpers import register_and_login
 
 
 def test_dashboard_summary(client):
-    client.post("/auth/register", json=register_payload())
+    register_and_login(client)
     r = client.get("/dashboard/summary")
     assert r.status_code == 200
     body = r.json()
@@ -13,7 +13,7 @@ def test_dashboard_summary(client):
 
 
 def test_top_clients_by_revenue(client):
-    client.post("/auth/register", json=register_payload())
+    register_and_login(client)
     c1 = client.post("/clients", json={"name": "Small Buyer"}).json()
     c2 = client.post("/clients", json={"name": "Big Buyer"}).json()
     due = (date.today() + timedelta(days=7)).isoformat()

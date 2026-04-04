@@ -106,11 +106,12 @@ export function InvoiceNew() {
 
       {atInvoiceCap && (
         <div className="rounded-xl border border-accent/40 bg-accent/10 px-4 py-3 font-sans text-sm text-charcoal dark:text-white">
-          You&apos;ve reached your plan&apos;s invoice limit for the last 30 days ({user.usage.invoices_last_30_days}/
-          {invCap}).{" "}
-          <Link to="/pricing" className="font-medium underline">
-            Upgrade
-          </Link>
+          You&apos;ve reached the invoice limit for the last 30 days ({user.usage.invoices_last_30_days}/{invCap}
+          ).{" "}
+          <Link to="/app/help" className="font-medium underline">
+            Help center
+          </Link>{" "}
+          explains how rolling limits work.
         </div>
       )}
 

@@ -203,7 +203,10 @@ def add_payment(
     if not inv:
         raise HTTPException(status_code=404, detail="Invoice not found")
     if inv.status == InvoiceStatus.draft:
-        raise HTTPException(status_code=400, detail="Send invoice before recording payment")
+        raise HTTPException(
+            status_code=400,
+            detail="Send the invoice before logging amounts received.",
+        )
     paid = sum((p.amount for p in inv.payments), Decimal("0"))
     outstanding = inv.total - paid
     if body.amount > outstanding:

@@ -61,13 +61,13 @@ export function Dashboard() {
           Dashboard
         </h1>
         <p className="font-sans mt-2 text-charcoal/60 dark:text-white/60">
-          Revenue, payments, and who pays you most — at a glance.
+          Revenue, amounts received, and who contributes most — at a glance.
         </p>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard label="Total invoiced" value={format(summary.total_invoiced)} variant="light" />
-        <StatCard label="Total paid" value={format(summary.total_paid)} variant="light" />
+        <StatCard label="Amounts received" value={format(summary.total_paid)} variant="light" />
         <StatCard label="Outstanding" value={format(summary.outstanding)} variant="soft" />
         <StatCard label="Overdue invoices" value={String(summary.overdue_count)} variant="accent" />
       </div>
@@ -97,7 +97,7 @@ export function Dashboard() {
                     v === undefined ? ["", ""] : [format(String(v)), "Revenue"]
                   }
                 />
-                <Bar dataKey="revenue" fill="#ffe17c" radius={[6, 6, 0, 0]} />
+                <Bar dataKey="revenue" fill="#9b2915" radius={[6, 6, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -105,11 +105,11 @@ export function Dashboard() {
 
         <div className="card-interactive rounded-2xl border border-charcoal/10 bg-white p-6 shadow-sm dark:border-white/10 dark:bg-dark">
           <h2 className="font-display text-xl uppercase tracking-wide text-charcoal dark:text-white">Top clients</h2>
-          <p className="font-sans mt-1 text-sm text-charcoal/55 dark:text-white/55">By payment revenue</p>
+          <p className="font-sans mt-1 text-sm text-charcoal/55 dark:text-white/55">By settled invoice totals</p>
           <ul className="mt-6 space-y-4">
             {!topClients?.length && (
               <li className="font-sans text-sm text-charcoal/50 dark:text-white/50">
-                No payments yet — add invoices and record payments.
+                No settlements yet — add invoices and log amounts received.
               </li>
             )}
             {topClients?.map((row, i) => (
@@ -138,7 +138,9 @@ export function Dashboard() {
 
       <div className="card-interactive overflow-hidden rounded-2xl border border-charcoal/10 bg-white shadow-sm dark:border-white/10 dark:bg-dark">
         <div className="border-b border-charcoal/10 px-6 py-4 dark:border-white/10">
-          <h2 className="font-display text-xl uppercase tracking-wide text-charcoal dark:text-white">Recent payments</h2>
+          <h2 className="font-display text-xl uppercase tracking-wide text-charcoal dark:text-white">
+            Recent activity
+          </h2>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-left font-sans text-sm">
@@ -153,7 +155,7 @@ export function Dashboard() {
               {summary.recent_transactions.length === 0 && (
                 <tr>
                   <td colSpan={3} className="px-6 py-8 text-center text-charcoal/50 dark:text-white/50">
-                    No payments yet.
+                    No recent settlements yet.
                   </td>
                 </tr>
               )}

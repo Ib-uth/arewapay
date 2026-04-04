@@ -1,6 +1,4 @@
-import { useState } from "react";
 import { Link, NavLink } from "react-router-dom";
-import { UpgradePlanModal } from "./UpgradePlanModal";
 import type { UserPublic } from "../types";
 import { userDisplayName } from "../lib/userDisplay";
 import {
@@ -24,14 +22,6 @@ const navItems: {
   { to: "/app/help", label: "Help", Icon: IconNavHelp },
 ];
 
-function planCopy(tier: string): { title: string; blurb: string } {
-  const t = tier.toLowerCase();
-  if (t === "free") return { title: "Starter", blurb: "Core invoicing for getting started." };
-  if (t === "premium") return { title: "Premium", blurb: "Higher limits and room to grow." };
-  if (t === "unlimited") return { title: "Unlimited", blurb: "No caps — built for busy teams." };
-  return { title: tier || "Plan", blurb: "Your subscription benefits." };
-}
-
 export function AppSidebar({
   user,
   onLogout,
@@ -43,9 +33,6 @@ export function AppSidebar({
   mobileOpen: boolean;
   onMobileOpenChange: (open: boolean) => void;
 }) {
-  const [upgradeOpen, setUpgradeOpen] = useState(false);
-  const plan = planCopy(user.subscription_tier);
-
   const linkClass = ({ isActive }: { isActive: boolean }) =>
     `font-sans flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
       isActive
@@ -53,8 +40,8 @@ export function AppSidebar({
         : "text-charcoal/70 hover:bg-charcoal/5 dark:text-white/70 dark:hover:bg-white/10"
     }`;
 
-  const upgradeBtnClass =
-    "font-sans relative mt-3 w-full overflow-hidden rounded-lg bg-charcoal py-2.5 text-sm font-medium text-white shadow-sm transition-colors before:pointer-events-none before:absolute before:inset-0 before:opacity-[0.06] before:[background-image:repeating-linear-gradient(-12deg,transparent,transparent_3px,rgba(255,255,255,0.9)_3px,rgba(255,255,255,0.9)_4px)] hover:bg-accent hover:text-charcoal dark:bg-accent dark:text-charcoal before:dark:opacity-[0.08] before:dark:[background-image:repeating-linear-gradient(-12deg,transparent,transparent_3px,rgba(23,30,25,0.35)_3px,rgba(23,30,25,0.35)_4px)] dark:hover:bg-white dark:hover:text-charcoal";
+  const helpCardBtnClass =
+    "font-sans relative mt-3 flex w-full items-center justify-center overflow-hidden rounded-lg bg-charcoal py-2.5 text-sm font-medium text-white shadow-sm transition-colors before:pointer-events-none before:absolute before:inset-0 before:opacity-[0.06] before:[background-image:repeating-linear-gradient(-12deg,transparent,transparent_3px,rgba(255,255,255,0.9)_3px,rgba(255,255,255,0.9)_4px)] hover:bg-accent hover:text-white dark:bg-accent dark:text-white before:dark:opacity-[0.08] before:dark:[background-image:repeating-linear-gradient(-12deg,transparent,transparent_3px,rgba(23,30,25,0.35)_3px,rgba(23,30,25,0.35)_4px)] dark:hover:brightness-110";
 
   const nav = (
     <>
@@ -75,20 +62,21 @@ export function AppSidebar({
       <div className="border-t border-charcoal/10 p-4 dark:border-white/10">
         <div className="rounded-xl border border-accent/40 bg-accent/10 p-4 dark:border-accent/30 dark:bg-accent/5">
           <p className="font-display text-xs uppercase tracking-wider text-charcoal/70 dark:text-white/70">
-            Current plan
+            Help &amp; resources
           </p>
-          <p className="font-sans mt-1 text-sm font-semibold text-charcoal dark:text-white">{plan.title}</p>
-          <p className="font-sans mt-1 text-xs leading-snug text-charcoal/65 dark:text-white/65">{plan.blurb}</p>
-          <button
-            type="button"
-            className={upgradeBtnClass}
-            onClick={() => {
-              setUpgradeOpen(true);
-              onMobileOpenChange(false);
-            }}
+          <p className="font-sans mt-1 text-sm font-semibold text-charcoal dark:text-white">
+            Get the most from ArewaPay
+          </p>
+          <p className="font-sans mt-1 text-xs leading-snug text-charcoal/65 dark:text-white/65">
+            Shortcuts, guides, and answers while you run your workspace.
+          </p>
+          <Link
+            to="/app/help"
+            className={helpCardBtnClass}
+            onClick={() => onMobileOpenChange(false)}
           >
-            Upgrade plan
-          </button>
+            Open Help
+          </Link>
         </div>
         <p className="mt-4 truncate font-sans text-sm font-bold text-charcoal dark:text-white">
           {userDisplayName(user)}
@@ -103,7 +91,6 @@ export function AppSidebar({
           Log out
         </button>
       </div>
-      <UpgradePlanModal open={upgradeOpen} onClose={() => setUpgradeOpen(false)} />
     </>
   );
 

@@ -102,9 +102,9 @@ export function ClientNew() {
 
       {atClientCap && (
         <div className="rounded-xl border border-accent/40 bg-accent/10 px-4 py-3 font-sans text-sm text-charcoal dark:text-white">
-          You&apos;re at your plan&apos;s client limit ({user.usage.clients}/{clientCap}).{" "}
-          <Link to="/pricing" className="font-medium underline">
-            Upgrade
+          You&apos;ve reached the client limit for your workspace ({user.usage.clients}/{clientCap}).{" "}
+          <Link to="/app/help" className="font-medium underline">
+            Help center
           </Link>
         </div>
       )}

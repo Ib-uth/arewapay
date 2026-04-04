@@ -184,7 +184,7 @@ export function InvoiceDetail() {
           )}
           className="card-interactive space-y-4 rounded-2xl border border-charcoal/10 bg-white p-6 shadow-sm"
         >
-          <h2 className="font-display text-xl uppercase tracking-wide text-charcoal">Record payment</h2>
+          <h2 className="font-display text-xl uppercase tracking-wide text-charcoal">Log amount received</h2>
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
               <label className="font-sans text-sm font-medium text-charcoal">
@@ -206,7 +206,7 @@ export function InvoiceDetail() {
             </div>
           </div>
           <Button type="submit" disabled={payMut.isPending} variant="dark" className="!rounded-lg">
-            {payMut.isPending ? "Saving…" : "Add payment"}
+            {payMut.isPending ? "Saving…" : "Add to invoice"}
           </Button>
         </form>
       )}
