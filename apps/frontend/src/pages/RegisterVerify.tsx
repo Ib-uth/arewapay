@@ -4,6 +4,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { apiFetch, fetchOtpStatus, resendRegisterOtp, type OtpStatus } from "../api/client";
+import { useToast } from "../components/ToastProvider";
 import { Button } from "../components/ui/Button";
 import { clearRootDarkClass } from "../lib/clearRootDarkClass";
 
@@ -17,6 +18,7 @@ const schema = z.object({
 type Form = z.infer<typeof schema>;
 
 export function RegisterVerify() {
+  const toast = useToast();
   const navigate = useNavigate();
   const location = useLocation();
   const state = location.state as { email?: string; email_sent?: boolean } | null;
@@ -66,9 +68,12 @@ export function RegisterVerify() {
         method: "POST",
         body: JSON.stringify({ email, otp: values.otp }),
       });
+      toast("Account verified — you can sign in.");
       navigate("/login", { replace: true, state: { registered: true } });
     } catch (e) {
-      setError("root", { message: e instanceof Error ? e.message : "Verification failed" });
+      const msg = e instanceof Error ? e.message : "Verification failed";
+      toast(msg, "error");
+      setError("root", { message: msg });
     }
   }
 
@@ -82,9 +87,15 @@ export function RegisterVerify() {
           ? "A new code was sent. Check your inbox and spam folder."
           : "We generated a new code, but email could not be sent (check server mail settings).",
       );
+      toast(
+        r.email_sent ? "New code sent — check your email." : "New code ready — email not sent.",
+        "info",
+      );
       await loadStatus();
     } catch (e) {
-      setResendNote(e instanceof Error ? e.message : "Could not resend code.");
+      const msg = e instanceof Error ? e.message : "Could not resend code.";
+      toast(msg, "error");
+      setResendNote(msg);
     } finally {
       setResendBusy(false);
     }

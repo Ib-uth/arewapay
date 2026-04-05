@@ -1,16 +1,16 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Link, useOutletContext } from "react-router-dom";
+import { useOutletContext } from "react-router-dom";
 import { apiFetch } from "../api/client";
+import { useToast } from "../components/ToastProvider";
 import { Button } from "../components/ui/Button";
 import { downloadCsv } from "../lib/csvExport";
 import type { Client, UserPublic } from "../types";
 
 export function Clients() {
   const qc = useQueryClient();
+  const toast = useToast();
   const { user } = useOutletContext<{ user: UserPublic }>();
   const canDelete = user.role === "owner";
-  const clientCap = user.limits.max_clients;
-  const atClientCap = clientCap != null && user.usage.clients >= clientCap;
 
   const { data: clients = [], isLoading } = useQuery({
     queryKey: ["clients"],
@@ -19,7 +19,13 @@ export function Clients() {
 
   const deleteMut = useMutation({
     mutationFn: (id: string) => apiFetch(`/clients/${id}`, { method: "DELETE" }),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["clients"] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["clients"] });
+      toast("Client deleted.");
+    },
+    onError: (e) => {
+      toast(e instanceof Error ? e.message : "Could not delete client.", "error");
+    },
   });
 
   function exportClients() {
@@ -36,6 +42,7 @@ export function Clients() {
         country_code: c.country_code ?? "",
       })),
     );
+    toast("Client list exported.");
   }
 
   if (isLoading) {
@@ -72,16 +79,6 @@ export function Clients() {
           </Button>
         </div>
       </div>
-
-      {atClientCap && (
-        <div className="rounded-xl border border-accent/40 bg-accent/10 px-4 py-3 font-sans text-sm text-charcoal dark:text-white">
-          You&apos;ve reached the client limit for your workspace ({user.usage.clients}/{clientCap}).{" "}
-          <Link to="/app/help" className="font-medium underline">
-            Help center
-          </Link>{" "}
-          has tips on organizing clients, or remove a client you no longer need.
-        </div>
-      )}
 
       <div className="overflow-x-auto rounded-2xl border border-charcoal/10 bg-white shadow-sm dark:border-white/10 dark:bg-dark/80">
         <table className="min-w-full border-collapse text-left font-sans text-sm">

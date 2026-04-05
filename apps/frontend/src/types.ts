@@ -9,16 +9,6 @@ export type InvoiceStatus =
 
 export type ThemePreference = "light" | "dark" | "system";
 
-export interface PlanLimits {
-  max_clients: number | null;
-  max_invoices_per_30_days: number | null;
-}
-
-export interface PlanUsage {
-  clients: number;
-  invoices_last_30_days: number;
-}
-
 export interface UserPublic {
   id: string;
   email: string;
@@ -33,10 +23,8 @@ export interface UserPublic {
   currency_code: string | null;
   theme: ThemePreference | null;
   onboarding_completed_at: string | null;
-  subscription_tier: string;
-  subscription_expires_at: string | null;
-  limits: PlanLimits;
-  usage: PlanUsage;
+  org_name: string | null;
+  logo_url: string | null;
 }
 
 export interface Client {
@@ -75,10 +63,16 @@ export interface Invoice {
   tax_rate: string;
   subtotal: string;
   tax_amount: string;
+  discount_rate: string;
+  discount_amount: string;
   total: string;
+  issue_date: string;
   due_date: string;
+  payment_terms: string | null;
+  po_number: string | null;
   bill_to_snapshot: string | null;
   notes: string | null;
+  times_sent: number;
   created_at: string;
   updated_at: string;
   items: InvoiceItem[];

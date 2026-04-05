@@ -1,11 +1,14 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
-import { Link, useNavigate, useOutletContext } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { apiFetch } from "../api/client";
+import { useNotifications } from "../components/NotificationProvider";
+import { useToast } from "../components/ToastProvider";
 import { Button } from "../components/ui/Button";
-import type { Client, UserPublic } from "../types";
+import { LabelWithInfo } from "../components/ui/InfoTip";
+import type { Client } from "../types";
 
 const schema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -32,16 +35,23 @@ const labelClass = "font-sans block text-sm font-medium text-charcoal dark:text-
 export function ClientNew() {
   const navigate = useNavigate();
   const qc = useQueryClient();
-  const { user } = useOutletContext<{ user: UserPublic }>();
-  const clientCap = user.limits.max_clients;
-  const atClientCap = clientCap != null && user.usage.clients >= clientCap;
-
+  const toast = useToast();
+  const { addNotification } = useNotifications();
   const createMut = useMutation({
     mutationFn: (body: Record<string, unknown>) =>
       apiFetch<Client>("/clients", { method: "POST", body: JSON.stringify(body) }),
-    onSuccess: () => {
+    onSuccess: (client) => {
       qc.invalidateQueries({ queryKey: ["clients"] });
+      toast("Client added.");
+      addNotification({
+        kind: "client",
+        title: "New client",
+        body: client.name,
+      });
       navigate("/app/clients");
+    },
+    onError: (e) => {
+      toast(e instanceof Error ? e.message : "Could not create client.", "error");
     },
   });
 
@@ -100,15 +110,6 @@ export function ClientNew() {
         </Link>
       </div>
 
-      {atClientCap && (
-        <div className="rounded-xl border border-accent/40 bg-accent/10 px-4 py-3 font-sans text-sm text-charcoal dark:text-white">
-          You&apos;ve reached the client limit for your workspace ({user.usage.clients}/{clientCap}).{" "}
-          <Link to="/app/help" className="font-medium underline">
-            Help center
-          </Link>
-        </div>
-      )}
-
       <form
         onSubmit={handleSubmit(onSubmit)}
         className="card-interactive space-y-5 rounded-2xl border border-charcoal/10 bg-white p-6 shadow-sm dark:border-white/10 dark:bg-dark/80"
@@ -152,8 +153,17 @@ export function ClientNew() {
                 <input className={`${inputClass} mt-2`} {...register("city")} />
               </div>
               <div>
-                <label className={labelClass}>Region / state</label>
-                <input className={`${inputClass} mt-2`} {...register("region")} />
+                <LabelWithInfo
+                  htmlFor="client-region"
+                  label="Region / State"
+                  labelClassName={labelClass}
+                  hint="State, province, or region — used on invoices and client addresses."
+                />
+                <input
+                  id="client-region"
+                  className={`${inputClass} mt-2`}
+                  {...register("region")}
+                />
               </div>
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
@@ -179,7 +189,7 @@ export function ClientNew() {
         {createMut.isError && (
           <p className="text-sm text-red-600">{(createMut.error as Error).message}</p>
         )}
-        <Button type="submit" disabled={createMut.isPending || atClientCap} variant="dark" className="w-full !rounded-lg py-3">
+        <Button type="submit" disabled={createMut.isPending} variant="dark" className="w-full !rounded-lg py-3">
           {createMut.isPending ? "Saving…" : "Create client"}
         </Button>
       </form>

@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import { apiFetch } from "../../api/client";
+import { useToast } from "../../components/ToastProvider";
 import { Button } from "../../components/ui/Button";
 import type { ThemePreference, UserPublic } from "../../types";
 
@@ -9,6 +10,7 @@ export function AccountSettings() {
   const { user } = useOutletContext<{ user: UserPublic }>();
   const qc = useQueryClient();
   const navigate = useNavigate();
+  const toast = useToast();
   const activeTheme = user.theme ?? "system";
   const [password, setPassword] = useState("");
   const [confirmPhrase, setConfirmPhrase] = useState("");
@@ -19,7 +21,13 @@ export function AccountSettings() {
         method: "PATCH",
         body: JSON.stringify({ theme: t }),
       }),
-    onSuccess: () => void qc.invalidateQueries({ queryKey: ["me"] }),
+    onSuccess: (_d, t) => {
+      void qc.invalidateQueries({ queryKey: ["me"] });
+      toast(`Theme: ${t}.`);
+    },
+    onError: (e) => {
+      toast(e instanceof Error ? e.message : "Could not update theme.", "error");
+    },
   });
 
   const deleteMut = useMutation({
@@ -36,6 +44,9 @@ export function AccountSettings() {
       }
       void qc.clear();
       navigate("/login", { replace: true });
+    },
+    onError: (e) => {
+      toast(e instanceof Error ? e.message : "Could not delete account.", "error");
     },
   });
 
@@ -91,9 +102,6 @@ export function AccountSettings() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
-        {deleteMut.isError && (
-          <p className="text-sm text-red-600">{String((deleteMut.error as Error).message)}</p>
-        )}
         <Button
           type="button"
           variant="ghost"

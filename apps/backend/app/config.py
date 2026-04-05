@@ -34,10 +34,6 @@ class Settings(BaseSettings):
     public_app_url: str = "http://localhost:5173"
     api_public_url: str = "http://localhost:8000"
 
-    revenuecat_webhook_secret: str | None = None
-    revenuecat_premium_product_ids: str = ""
-    revenuecat_unlimited_product_ids: str = ""
-
     @field_validator("database_url", mode="before")
     @classmethod
     def database_url_for_sqlalchemy(cls, v: object) -> object:

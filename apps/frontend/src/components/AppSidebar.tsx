@@ -14,11 +14,12 @@ const navItems: {
   label: string;
   end?: boolean;
   Icon: typeof IconNavDashboard;
+  tour?: string;
 }[] = [
-  { to: "/app", label: "Dashboard", end: true, Icon: IconNavDashboard },
-  { to: "/app/clients", label: "Clients", Icon: IconNavClients },
-  { to: "/app/invoices", label: "Invoices", Icon: IconNavInvoice },
-  { to: "/app/settings", label: "Settings", Icon: IconNavSettings },
+  { to: "/app", label: "Dashboard", end: true, Icon: IconNavDashboard, tour: "tour-nav-dashboard" },
+  { to: "/app/clients", label: "Clients", Icon: IconNavClients, tour: "tour-nav-clients" },
+  { to: "/app/invoices", label: "Invoices", Icon: IconNavInvoice, tour: "tour-nav-invoices" },
+  { to: "/app/settings", label: "Settings", Icon: IconNavSettings, tour: "tour-nav-settings" },
   { to: "/app/help", label: "Help", Icon: IconNavHelp },
 ];
 
@@ -51,6 +52,7 @@ export function AppSidebar({
             key={item.to}
             to={item.to}
             end={item.end}
+            data-tour={item.tour}
             className={linkClass}
             onClick={() => onMobileOpenChange(false)}
           >
@@ -105,6 +107,7 @@ export function AppSidebar({
         />
       )}
       <aside
+        data-tour="tour-sidebar"
         className={`fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r border-charcoal/10 bg-white transition-transform dark:border-white/10 dark:bg-charcoal ${
           mobileOpen ? "translate-x-0" : "-translate-x-full"
         } lg:translate-x-0`}

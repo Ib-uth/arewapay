@@ -11,7 +11,7 @@
   <img src="https://img.shields.io/badge/GitHub_Actions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white" alt="GitHub Actions" />
 </p>
 
-**Invoicing and receivables for African SMEs** — multi-currency clients and invoices, balance visibility, overdue tracking, and workspace limits (no storefront checkout in the app UI).
+**Invoicing and receivables for African SMEs** — multi-currency clients and invoices, balance visibility, and overdue tracking.
 
 **Live demo:** _Add your deployed URL (e.g. Railway + static host)._
 
@@ -27,7 +27,6 @@
 | **Backend** | Python 3.11+, FastAPI, SQLAlchemy 2, Alembic, Pydantic, JWT + httpOnly cookies, bcrypt, slowapi |
 | **Data** | PostgreSQL 16, Redis 7 |
 | **Infra** | Docker Compose, nginx (frontend image), GitHub Actions CI |
-| **Billing** | RevenueCat (web SDK + server webhooks mapping products to tiers) |
 
 ---
 
@@ -35,12 +34,11 @@
 
 - **Auth & session:** Email OTP registration (`/auth/register/request` → `/auth/register/verify`), login only after verified email, JWT access + refresh in httpOnly cookies, `/auth/me`, logout.
 - **Onboarding:** First-run flow (country, currency, optional company name, short survey) before the main app.
-- **Dashboard:** Revenue summary, monthly chart, top clients, plan usage.
+- **Dashboard:** Revenue summary, monthly chart, top clients.
 - **Clients:** Table view, CSV export, structured address fields; **Add client** on a dedicated page.
 - **Invoices:** Table + export, create flow with line items, tax, due date; **bill-to** snapshot from the client address; PDF download; settlement rows and status (draft → paid / overdue).
 - **Settings:** Full-width **Profile** and **Account** (display name, country, currency, theme). Theme (light / dark / system) applies **inside the signed-in app** only; marketing and auth pages stay light.
-- **Plans & limits:** Tier-based caps on clients and rolling invoice volume; in-app copy points to Help instead of checkout.
-- **Marketing:** Landing, features, FAQ/contact page (`/pricing` route), about, legal pages; nav shows an **avatar menu** when you’re logged in (dashboard, profile, logout).
+- **Marketing:** Landing, features, about (FAQ link), legal pages; nav shows an **avatar menu** when you’re logged in (dashboard, profile, logout).
 
 ---
 

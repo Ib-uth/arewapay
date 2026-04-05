@@ -3,6 +3,7 @@ import { Navigate, useNavigate } from "react-router-dom";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useOutletContext } from "react-router-dom";
 import { apiFetch } from "../api/client";
+import { useToast } from "../components/ToastProvider";
 import { Button } from "../components/ui/Button";
 import { AFRICAN_COUNTRIES, ISO_CURRENCIES } from "../lib/africanCountries";
 import type { UserPublic } from "../types";
@@ -11,6 +12,7 @@ export function Onboarding() {
   const { user } = useOutletContext<{ user: UserPublic }>();
   const navigate = useNavigate();
   const qc = useQueryClient();
+  const toast = useToast();
   const [displayName, setDisplayName] = useState(user.display_name ?? "");
   const [companyName, setCompanyName] = useState("");
   const [country, setCountry] = useState(user.country_code ?? "NG");
@@ -42,7 +44,11 @@ export function Onboarding() {
     },
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ["me"] });
+      toast("Workspace ready — welcome aboard.");
       navigate("/app", { replace: true });
+    },
+    onError: (e) => {
+      toast(e instanceof Error ? e.message : "Could not complete setup.", "error");
     },
   });
 

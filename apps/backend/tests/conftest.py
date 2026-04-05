@@ -8,9 +8,6 @@ from sqlalchemy.pool import NullPool, StaticPool
 
 os.environ.setdefault("DATABASE_URL", "sqlite:///:memory:")
 os.environ.setdefault("JWT_SECRET", "test-secret-key-for-pytest-only-32chars")
-os.environ.setdefault("REVENUECAT_WEBHOOK_SECRET", "test-webhook-secret")
-os.environ.setdefault("REVENUECAT_PREMIUM_PRODUCT_IDS", "premium_monthly,premium_yearly")
-os.environ.setdefault("REVENUECAT_UNLIMITED_PRODUCT_IDS", "lifetime")
 
 from app.config import settings  # noqa: E402
 from app.core.limiter import limiter  # noqa: E402

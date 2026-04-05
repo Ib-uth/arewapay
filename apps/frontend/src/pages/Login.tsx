@@ -4,6 +4,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { apiFetch } from "../api/client";
+import { useToast } from "../components/ToastProvider";
 import { Button } from "../components/ui/Button";
 import { clearRootDarkClass } from "../lib/clearRootDarkClass";
 
@@ -15,6 +16,7 @@ const schema = z.object({
 type Form = z.infer<typeof schema>;
 
 export function Login() {
+  const toast = useToast();
   const navigate = useNavigate();
   const location = useLocation();
   const justVerified = Boolean((location.state as { registered?: boolean } | null)?.registered);
@@ -36,9 +38,12 @@ export function Login() {
         method: "POST",
         body: JSON.stringify(values),
       });
+      toast("Signed in successfully.");
       navigate("/app");
     } catch (e) {
-      setError("root", { message: e instanceof Error ? e.message : "Login failed" });
+      const msg = e instanceof Error ? e.message : "Login failed";
+      toast(msg, "error");
+      setError("root", { message: msg });
     }
   }
 

@@ -19,7 +19,7 @@ export function Features() {
             <Button variant="primary" to="/register">
               Get started
             </Button>
-            <Button variant="ghost" to="/pricing">
+            <Button variant="ghost" to="/about">
               FAQ &amp; contact
             </Button>
           </div>

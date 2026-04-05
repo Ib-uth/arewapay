@@ -21,11 +21,32 @@ class InvoiceCreate(BaseModel):
     notes: str | None = None
     items: list[InvoiceItemIn] = Field(min_length=1)
     status: InvoiceStatus = InvoiceStatus.draft
+    issue_date: date | None = None
+    payment_terms: str | None = Field(None, max_length=64)
+    po_number: str | None = Field(None, max_length=64)
+    discount_rate: Decimal = Field(default=Decimal("0"), ge=0, le=1)
+    invoice_number_prefix: str | None = None
+
+    @field_validator("invoice_number_prefix", mode="before")
+    @classmethod
+    def normalize_prefix(cls, v: object) -> object:
+        if v is None or v == "":
+            return None
+        if not isinstance(v, str):
+            return v
+        letters = "".join(c for c in v.upper() if c.isalpha())
+        if len(letters) != 3:
+            raise ValueError("Invoice prefix must be exactly 3 letters A–Z")
+        return letters
 
 
 class InvoiceUpdate(BaseModel):
     due_date: date | None = None
+    issue_date: date | None = None
     tax_rate: Decimal | None = Field(default=None, ge=0, le=1)
+    discount_rate: Decimal | None = Field(default=None, ge=0, le=1)
+    payment_terms: str | None = Field(None, max_length=64)
+    po_number: str | None = Field(None, max_length=64)
     notes: str | None = None
     status: InvoiceStatus | None = None
     items: list[InvoiceItemIn] | None = None
@@ -51,10 +72,16 @@ class InvoiceOut(BaseModel):
     tax_rate: Decimal
     subtotal: Decimal
     tax_amount: Decimal
+    discount_rate: Decimal
+    discount_amount: Decimal
     total: Decimal
+    issue_date: date
     due_date: date
+    payment_terms: str | None
+    po_number: str | None
     bill_to_snapshot: str | None
     notes: str | None
+    times_sent: int = 0
     created_at: datetime
     updated_at: datetime
     items: list[InvoiceItemOut]

@@ -6,7 +6,7 @@ import { MarketingUserMenu } from "../marketing/MarketingUserMenu";
 
 const links = [
   { to: "/features", label: "Features" },
-  { to: "/pricing", label: "FAQ" },
+  { to: "/about", label: "FAQ" },
   { to: "/about", label: "About" },
 ];
 

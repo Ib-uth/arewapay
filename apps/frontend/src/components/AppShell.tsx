@@ -6,6 +6,8 @@ import { useResolvedAppTheme } from "../hooks/useResolvedAppTheme";
 import { apiFetch } from "../api/client";
 import { AppSidebar } from "./AppSidebar";
 import { AppTopBar } from "./AppTopBar";
+import { AppTour } from "./AppTour";
+import { NotificationProvider } from "./NotificationProvider";
 export function AppShell() {
   const { data, isLoading, isError } = useMe();
   const navigate = useNavigate();
@@ -78,26 +80,29 @@ export function AppShell() {
 
   return (
     <AppThemeProvider isDark={isDark}>
-      <div className={shellClass}>
-        <AppSidebar
-          user={u}
-          onLogout={() => void logout()}
-          mobileOpen={mobileMenuOpen}
-          onMobileOpenChange={setMobileMenuOpen}
-        />
-        <AppTopBar user={u} onOpenMobileMenu={() => setMobileMenuOpen(true)} />
-        <main className="min-h-screen pl-0 pt-14 lg:pl-64">
-          <div
-            className={
-              isSettingsRoute
-                ? "min-h-[calc(100vh-3.5rem)] w-full px-4 py-6 sm:px-6 lg:px-10 lg:py-8"
-                : "mx-auto max-w-6xl px-4 py-8 lg:px-8 lg:py-10"
-            }
-          >
-            <Outlet context={{ user: u }} />
-          </div>
-        </main>
-      </div>
+      <NotificationProvider>
+        <div className={shellClass}>
+          <AppTour user={u} onOpenMobileSidebar={() => setMobileMenuOpen(true)} />
+          <AppSidebar
+            user={u}
+            onLogout={() => void logout()}
+            mobileOpen={mobileMenuOpen}
+            onMobileOpenChange={setMobileMenuOpen}
+          />
+          <AppTopBar user={u} onOpenMobileMenu={() => setMobileMenuOpen(true)} />
+          <main className="min-h-screen pl-0 pt-14 lg:pl-64">
+            <div
+              className={
+                isSettingsRoute
+                  ? "min-h-[calc(100vh-3.5rem)] w-full px-4 py-6 sm:px-6 lg:px-10 lg:py-8"
+                  : "mx-auto max-w-6xl px-4 py-8 lg:px-8 lg:py-10"
+              }
+            >
+              <Outlet context={{ user: u }} />
+            </div>
+          </main>
+        </div>
+      </NotificationProvider>
     </AppThemeProvider>
   );
 }

@@ -51,13 +51,8 @@ class User(Base):
     )
     company_name: Mapped[str | None] = mapped_column(String(255), nullable=True)
     onboarding_survey: Mapped[dict | list | None] = mapped_column(JSON, nullable=True)
-    subscription_tier: Mapped[str] = mapped_column(String(16), nullable=False, default="free")
-    subscription_expires_at: Mapped[datetime | None] = mapped_column(
-        DateTime(timezone=True), nullable=True
-    )
-    revenuecat_last_event_at: Mapped[datetime | None] = mapped_column(
-        DateTime(timezone=True), nullable=True
-    )
+    org_name: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    logo_url: Mapped[str | None] = mapped_column(String(512), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
 
     refresh_tokens: Mapped[list["RefreshToken"]] = relationship(

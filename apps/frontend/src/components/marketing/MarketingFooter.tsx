@@ -28,7 +28,7 @@ export function MarketingFooter() {
                 </Link>
               </li>
               <li>
-                <Link className="hover:text-accent" to="/pricing">
+                <Link className="hover:text-accent" to="/about">
                   FAQ
                 </Link>
               </li>

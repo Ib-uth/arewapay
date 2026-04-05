@@ -14,8 +14,8 @@ def test_dashboard_summary(client):
 
 def test_top_clients_by_revenue(client):
     register_and_login(client)
-    c1 = client.post("/clients", json={"name": "Small Buyer"}).json()
-    c2 = client.post("/clients", json={"name": "Big Buyer"}).json()
+    c1 = client.post("/clients", json={"name": "Small Buyer", "email": "s@example.com"}).json()
+    c2 = client.post("/clients", json={"name": "Big Buyer", "email": "b@example.com"}).json()
     due = (date.today() + timedelta(days=7)).isoformat()
 
     inv1 = client.post(
@@ -25,10 +25,10 @@ def test_top_clients_by_revenue(client):
             "due_date": due,
             "tax_rate": "0",
             "currency": "NGN",
-            "status": "sent",
             "items": [{"description": "A", "quantity": "1", "unit_price": "1000"}],
         },
     ).json()
+    assert client.post(f"/invoices/{inv1['id']}/send").status_code == 200
     client.post(f"/invoices/{inv1['id']}/payments", json={"amount": inv1["total"]})
 
     inv2 = client.post(
@@ -38,10 +38,10 @@ def test_top_clients_by_revenue(client):
             "due_date": due,
             "tax_rate": "0",
             "currency": "NGN",
-            "status": "sent",
             "items": [{"description": "B", "quantity": "1", "unit_price": "5000"}],
         },
     ).json()
+    assert client.post(f"/invoices/{inv2['id']}/send").status_code == 200
     client.post(f"/invoices/{inv2['id']}/payments", json={"amount": inv2["total"]})
 
     r = client.get("/dashboard/top-clients")

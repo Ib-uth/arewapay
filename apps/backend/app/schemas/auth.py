@@ -78,16 +78,6 @@ class OtpStatusOut(BaseModel):
     email_configured: bool = False
 
 
-class PlanLimitsOut(BaseModel):
-    max_clients: int | None
-    max_invoices_per_30_days: int | None
-
-
-class PlanUsageOut(BaseModel):
-    clients: int
-    invoices_last_30_days: int
-
-
 class UserPublic(BaseModel):
     id: UUID
     email: str
@@ -102,26 +92,19 @@ class UserPublic(BaseModel):
     currency_code: str | None = None
     theme: Literal["light", "dark", "system"] | None = None
     onboarding_completed_at: datetime | None = None
-    subscription_tier: str
-    subscription_expires_at: datetime | None = None
-    limits: PlanLimitsOut
-    usage: PlanUsageOut
+    org_name: str | None = None
+    logo_url: str | None = None
 
     model_config = {"from_attributes": True}
 
     @classmethod
-    def from_user(cls, db: Session, u: object) -> "UserPublic":
-        from app.core.plans import limits_for
+    def from_user(cls, _db: Session, u: object) -> "UserPublic":
         from app.models.user import User as UserModel
-        from app.services.plan_enforcement import effective_tier
-        from app.services.usage import count_clients_for_owner, count_invoices_last_30_days
 
         assert isinstance(u, UserModel)
         theme_val: str | None = u.theme
         if theme_val not in ("light", "dark", "system", None):
             theme_val = "system"
-        tier = effective_tier(u)
-        lim = limits_for(tier)
         return cls(
             id=u.id,
             email=u.email,
@@ -136,16 +119,8 @@ class UserPublic(BaseModel):
             currency_code=u.currency_code.upper() if u.currency_code else None,
             theme=theme_val,  # type: ignore[arg-type]
             onboarding_completed_at=u.onboarding_completed_at,
-            subscription_tier=tier.value,
-            subscription_expires_at=u.subscription_expires_at,
-            limits=PlanLimitsOut(
-                max_clients=lim.max_clients,
-                max_invoices_per_30_days=lim.max_invoices_per_30_days,
-            ),
-            usage=PlanUsageOut(
-                clients=count_clients_for_owner(db, u.id),
-                invoices_last_30_days=count_invoices_last_30_days(db, u.id),
-            ),
+            org_name=u.org_name,
+            logo_url=u.logo_url,
         )
 
 
@@ -154,6 +129,8 @@ class UserProfileUpdate(BaseModel):
     country_code: str | None = Field(None, min_length=2, max_length=2)
     currency_code: str | None = Field(None, min_length=3, max_length=3)
     theme: Literal["light", "dark", "system"] | None = None
+    org_name: str | None = Field(None, max_length=255)
+    logo_url: str | None = Field(None, max_length=512)
 
     @field_validator("country_code", "currency_code", mode="before")
     @classmethod
@@ -212,3 +189,7 @@ class DeleteAccountRequest(BaseModel):
 
 class MeResponse(BaseModel):
     user: UserPublic
+
+
+class LogoUploadOut(BaseModel):
+    logo_url: str

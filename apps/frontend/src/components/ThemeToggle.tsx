@@ -1,9 +1,11 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiFetch } from "../api/client";
+import { useToast } from "./ToastProvider";
 import type { ThemePreference, UserPublic } from "../types";
 
 export function ThemeToggle({ user }: { user: UserPublic }) {
   const qc = useQueryClient();
+  const toast = useToast();
   const active = user.theme ?? "system";
 
   const mut = useMutation({
@@ -12,7 +14,13 @@ export function ThemeToggle({ user }: { user: UserPublic }) {
         method: "PATCH",
         body: JSON.stringify({ theme: t }),
       }),
-    onSuccess: () => void qc.invalidateQueries({ queryKey: ["me"] }),
+    onSuccess: (_d, t) => {
+      void qc.invalidateQueries({ queryKey: ["me"] });
+      toast(`Theme: ${t === "system" ? "Auto" : t}.`);
+    },
+    onError: (e) => {
+      toast(e instanceof Error ? e.message : "Could not update theme.", "error");
+    },
   });
 
   return (

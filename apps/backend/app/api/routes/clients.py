@@ -10,7 +10,6 @@ from app.db import get_db
 from app.deps.auth import CurrentUser
 from app.models.client import Client
 from app.schemas.client import ClientCreate, ClientOut, ClientUpdate
-from app.services.plan_enforcement import assert_can_add_client
 
 router = APIRouter(prefix="/clients", tags=["clients"])
 
@@ -27,7 +26,6 @@ def create_client(
     user: CurrentUser,
     db: Annotated[Session, Depends(get_db)],
 ) -> Client:
-    assert_can_add_client(db, user)
     c = Client(
         owner_id=user.id,
         name=body.name,

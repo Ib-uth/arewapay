@@ -2,7 +2,6 @@ import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { apiFetch } from "../api/client";
 import { Button } from "../components/ui/Button";
-import { downloadCsv } from "../lib/csvExport";
 import { useMoneyFormat } from "../hooks/useMoneyFormat";
 import type { Invoice } from "../types";
 
@@ -24,20 +23,6 @@ export function Invoices() {
     queryFn: () => apiFetch<Invoice[]>("/invoices"),
   });
 
-  function exportInvoices() {
-    downloadCsv(
-      `invoices-${new Date().toISOString().slice(0, 10)}.csv`,
-      invoices.map((inv) => ({
-        invoice_number: inv.invoice_number,
-        status: inv.status,
-        due_date: inv.due_date,
-        currency: inv.currency,
-        total: inv.total,
-        client_id: inv.client_id,
-      })),
-    );
-  }
-
   if (isLoading) {
     return (
       <div className="flex min-h-[30vh] items-center justify-center">
@@ -58,15 +43,6 @@ export function Invoices() {
           </p>
         </div>
         <div className="flex flex-wrap gap-3">
-          <Button
-            type="button"
-            variant="ghost"
-            className="!rounded-lg !py-3 dark:border-white/20 dark:bg-white/5 dark:text-white dark:hover:bg-white/10"
-            onClick={exportInvoices}
-            disabled={invoices.length === 0}
-          >
-            Export invoices
-          </Button>
           <Button to="/app/invoices/new" variant="primary" className="!rounded-lg !py-3 !text-base">
             New invoice
           </Button>

@@ -8,9 +8,6 @@ RUN npm ci
 COPY apps/frontend ./apps/frontend
 COPY packages/shared-types ./packages/shared-types
 WORKDIR /repo/apps/frontend
-# Baked into the static bundle at build time (pass from docker-compose `build.args` or `fly deploy --build-arg`).
-ARG VITE_REVENUECAT_API_KEY=
-ENV VITE_REVENUECAT_API_KEY=$VITE_REVENUECAT_API_KEY
 RUN npm run build
 
 FROM nginx:1.27-alpine

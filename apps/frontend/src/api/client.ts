@@ -102,3 +102,33 @@ export async function resendRegisterOtp(
 export async function refreshSession(): Promise<void> {
   await apiFetch("/auth/refresh", { method: "POST" });
 }
+
+async function postLogo(file: File): Promise<Response> {
+  const fd = new FormData();
+  fd.append("file", file);
+  return fetch(`${BASE}/users/me/logo`, {
+    method: "POST",
+    credentials: "include",
+    body: fd,
+  });
+}
+
+/** Multipart upload does not go through apiFetch; refresh access cookie if it expired. */
+export async function uploadLogo(file: File): Promise<{ logo_url: string }> {
+  let res = await postLogo(file);
+  if (res.status === 401) {
+    try {
+      await refreshSession();
+    } catch {
+      /* fall through to parse error */
+    }
+    res = await postLogo(file);
+  }
+  const text = await res.text();
+  const data = text ? JSON.parse(text) : undefined;
+  if (!res.ok) {
+    const d = data as { detail?: string };
+    throw new Error(typeof d?.detail === "string" ? d.detail : res.statusText);
+  }
+  return data as { logo_url: string };
+}

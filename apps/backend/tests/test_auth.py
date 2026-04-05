@@ -27,6 +27,29 @@ def test_register_verify_login_me(client):
     assert r4.json()["user"]["email_verified"] is True
 
 
+def test_me_returns_org_name_and_logo_after_patch(client):
+    body = register_payload()
+    client.post("/auth/register/request", json=body)
+    otp = consume_last_test_otp()
+    client.post("/auth/register/verify", json={"email": body["email"], "otp": otp})
+    client.post("/auth/login", json={"email": body["email"], "password": body["password"]})
+    r_patch = client.patch(
+        "/users/me",
+        json={
+            "org_name": "Acme Ltd",
+            "logo_url": "/uploads/logos/test.png",
+        },
+    )
+    assert r_patch.status_code == 200
+    assert r_patch.json()["user"]["org_name"] == "Acme Ltd"
+    assert r_patch.json()["user"]["logo_url"] == "/uploads/logos/test.png"
+    r_me = client.get("/auth/me")
+    assert r_me.status_code == 200
+    u = r_me.json()["user"]
+    assert u["org_name"] == "Acme Ltd"
+    assert u["logo_url"] == "/uploads/logos/test.png"
+
+
 def test_login_invalid(client):
     r = client.post(
         "/auth/login",

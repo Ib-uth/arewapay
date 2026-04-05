@@ -5,6 +5,7 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { apiFetch } from "../api/client";
+import { useToast } from "../components/ToastProvider";
 import { Button } from "../components/ui/Button";
 
 function strengthMeta(pw: string): { pct: number; label: "Weak" | "Fair" | "Strong" } {
@@ -49,6 +50,7 @@ const schema = z
 type Form = z.infer<typeof schema>;
 
 export function Register() {
+  const toast = useToast();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const emailParam = searchParams.get("email") ?? "";
@@ -98,11 +100,19 @@ export function Register() {
           phone: values.phone.trim(),
         }),
       });
+      toast(
+        res.email_sent
+          ? "Check your email for a verification code."
+          : "Verification code created — email could not be sent (check server settings).",
+        "info",
+      );
       navigate("/register/verify", {
         state: { email: values.email, email_sent: res.email_sent },
       });
     } catch (e) {
-      setError("root", { message: e instanceof Error ? e.message : "Registration failed" });
+      const msg = e instanceof Error ? e.message : "Registration failed";
+      toast(msg, "error");
+      setError("root", { message: msg });
     }
   }
 
